@@ -69,6 +69,7 @@ Development is saga driven (AgentRail) and TDD.
   "harder" tier exists because XY-wing (added as the common wing-class
   technique) unlocks puzzles the basic-fish ladder would otherwise send to
   trial; pure X-wing-required puzzles appear at roughly 1 per 80 deep digs.
+  Measured separation evidence lives in `docs/difficulty-stats.md`.
 
 Cell values are stored as 1..=9; any other `Value` payload violates the
 documented invariant and is never produced by `parse` or generation.

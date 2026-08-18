@@ -1,6 +1,6 @@
 number = 7
 slug = "statistical-gates"
-status = "pending"
+status = "in-progress"
 description = "Add seeded statistical gate tests for difficulty robustness: for each level, ..."
 role = "production"
 context_files = []
