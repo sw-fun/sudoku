@@ -1,0 +1,8 @@
+number = 3
+slug = "solver-uniqueness"
+status = "pending"
+description = "TDD a deterministic backtracking solver with candidate ordering and a solutio..."
+role = "production"
+context_files = []
+created_at = "2026-08-18T15:43:18"
+commits = []

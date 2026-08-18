@@ -1,0 +1,8 @@
+number = 4
+slug = "generator"
+status = "pending"
+description = "TDD random puzzle generation: seeded RNG full-grid generation via randomized ..."
+role = "production"
+context_files = []
+created_at = "2026-08-18T15:43:25"
+commits = []

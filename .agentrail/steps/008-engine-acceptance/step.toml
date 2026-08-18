@@ -1,0 +1,8 @@
+number = 8
+slug = "engine-acceptance"
+status = "pending"
+description = "Engine acceptance: run the full just check gate plus a large seeded sample ru..."
+role = "validation"
+context_files = []
+created_at = "2026-08-18T15:43:30"
+commits = []
