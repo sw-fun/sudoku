@@ -37,6 +37,14 @@ Development is saga driven (AgentRail) and TDD.
   and most-constrained-cell selection; `count_solutions(board, cap)` stops
   at `cap` finds so `cap = 2` decides uniqueness; `is_solved` checks
   complete and consistent. Solves AI Escargot well under the 2s test bound.
+- `rng` - SplitMix64 with a pinned golden stream; seeding an `Rng` with the
+  same seed reproduces the same numbers forever.
+- `generator` - `generate_full(seed)` builds a complete valid grid via
+  randomized backtracking; `generate_puzzle(seed, DigParams)` digs clues in
+  shuffled order (optionally point-symmetric pairs), removing a clue only
+  when the capped counter still proves a unique solution. Digging stops at
+  `target_clues` or when every remaining clue is load-bearing, so it always
+  terminates. Same seed, same puzzle.
 
 Cell values are stored as 1..=9; any other `Value` payload violates the
 documented invariant and is never produced by `parse` or generation.

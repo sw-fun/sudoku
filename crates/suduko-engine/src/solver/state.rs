@@ -1,7 +1,7 @@
 use crate::grid::coords::{block_of, col_of, row_of};
 use crate::grid::{Board, CELL_COUNT, Cell};
 
-const ALL_DIGITS: u16 = 0x1FF;
+pub const ALL_DIGITS: u16 = 0x1FF;
 
 pub struct State {
     pub cells: [Cell; CELL_COUNT],

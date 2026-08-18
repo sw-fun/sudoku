@@ -1,6 +1,6 @@
 number = 4
 slug = "generator"
-status = "pending"
+status = "in-progress"
 description = "TDD random puzzle generation: seeded RNG full-grid generation via randomized ..."
 role = "production"
 context_files = []

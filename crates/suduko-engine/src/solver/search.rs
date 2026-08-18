@@ -1,7 +1,7 @@
 use super::state::State;
 use crate::grid::{CELL_COUNT, Cell};
 
-pub enum Pick {
+pub(crate) enum Pick {
     Solved,
     DeadEnd,
     Cell(usize),
@@ -40,7 +40,7 @@ pub fn search(
     }
 }
 
-fn pick_cell(state: &State) -> Pick {
+pub(crate) fn pick_cell(state: &State) -> Pick {
     let mut best: Option<(usize, usize)> = None;
     for idx in 0..CELL_COUNT {
         if !state.cells[idx].is_empty() {

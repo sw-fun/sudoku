@@ -1,5 +1,5 @@
-mod search;
-mod state;
+pub(crate) mod search;
+pub(crate) mod state;
 
 use crate::grid::{Board, CELL_COUNT, Cell};
 use crate::validate::first_conflict;

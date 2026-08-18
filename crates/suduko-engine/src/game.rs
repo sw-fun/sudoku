@@ -33,6 +33,10 @@ impl Puzzle {
         &self.solution
     }
 
+    pub fn clues(&self) -> &Board {
+        &self.clues
+    }
+
     pub fn clue_count(&self) -> usize {
         (0..CELL_COUNT)
             .filter(|&i| !self.clues.get(i).is_empty())
