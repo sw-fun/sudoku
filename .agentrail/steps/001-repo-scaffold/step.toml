@@ -1,8 +1,9 @@
 number = 1
 slug = "repo-scaffold"
-status = "in-progress"
+status = "completed"
 description = "Create the Cargo workspace per docs/plan.md: crates/suduko-engine (pure Rust ..."
 role = "production"
 context_files = []
 created_at = "2026-08-18T15:43:18"
-commits = []
+completed_at = "2026-08-18T15:48:02"
+commits = ["48bca0751c34d48367d83464190b902eb7e7c455"]
