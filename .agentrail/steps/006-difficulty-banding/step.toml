@@ -1,8 +1,9 @@
 number = 6
 slug = "difficulty-banding"
-status = "in-progress"
+status = "completed"
 description = "TDD difficulty targeting: define score bands and givens-count ranges for easy..."
 role = "production"
 context_files = []
 created_at = "2026-08-18T15:43:25"
-commits = []
+completed_at = "2026-08-18T16:26:49"
+commits = ["bf45452abb80c9bfb3740fe48b07d638468aedec"]
