@@ -1,8 +1,9 @@
 number = 7
 slug = "statistical-gates"
-status = "in-progress"
+status = "completed"
 description = "Add seeded statistical gate tests for difficulty robustness: for each level, ..."
 role = "production"
 context_files = []
 created_at = "2026-08-18T15:43:30"
-commits = []
+completed_at = "2026-08-18T16:28:16"
+commits = ["c503c201349937b54d503b2f5204d40cde6faf5b"]
