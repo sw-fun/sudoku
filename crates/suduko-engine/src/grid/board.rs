@@ -14,6 +14,10 @@ impl Board {
         }
     }
 
+    pub fn from_cells(cells: [Cell; CELL_COUNT]) -> Self {
+        Board { cells }
+    }
+
     /// Returns the cell at `idx` (0..81), row-major. Panics if out of range.
     pub fn get(&self, idx: usize) -> Cell {
         self.cells[idx]

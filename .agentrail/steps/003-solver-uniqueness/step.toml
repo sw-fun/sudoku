@@ -1,6 +1,6 @@
 number = 3
 slug = "solver-uniqueness"
-status = "pending"
+status = "in-progress"
 description = "TDD a deterministic backtracking solver with candidate ordering and a solutio..."
 role = "production"
 context_files = []

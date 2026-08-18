@@ -33,6 +33,10 @@ Development is saga driven (AgentRail) and TDD.
 - `game` - `Puzzle::new(clues, solution)` fails closed on incomplete,
   inconsistent, or mismatched solutions; exposes `solution()` and
   `clue_count()`.
+- `solver` - deterministic backtracking (`solve`) with ascending digit order
+  and most-constrained-cell selection; `count_solutions(board, cap)` stops
+  at `cap` finds so `cap = 2` decides uniqueness; `is_solved` checks
+  complete and consistent. Solves AI Escargot well under the 2s test bound.
 
 Cell values are stored as 1..=9; any other `Value` payload violates the
 documented invariant and is never produced by `parse` or generation.
