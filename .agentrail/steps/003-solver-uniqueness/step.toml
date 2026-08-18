@@ -1,8 +1,9 @@
 number = 3
 slug = "solver-uniqueness"
-status = "in-progress"
+status = "completed"
 description = "TDD a deterministic backtracking solver with candidate ordering and a solutio..."
 role = "production"
 context_files = []
 created_at = "2026-08-18T15:43:18"
-commits = []
+completed_at = "2026-08-18T15:53:23"
+commits = ["ade355e1e844fb782d75c731012e68e69de8db46"]

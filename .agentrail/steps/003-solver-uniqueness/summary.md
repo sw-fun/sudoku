@@ -1,0 +1,1 @@
+Solver TDD complete: deterministic backtracking solve(), capped count_solutions (cap 2 decides uniqueness), is_solved. Bitmask state + MRV cell selection, split across solver/{mod,state,search} to stay within module function budgets. All embedded fixture tests green including AI Escargot under a 2s bound. README solver section added. just check green; committed.
