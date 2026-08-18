@@ -1,9 +1,10 @@
-use suduko_engine::{Board, Cell};
+use suduko_engine::grid::{Board, CELL_COUNT, Cell};
 
 #[test]
 fn engine_exposes_grid_model_types() {
     let board = Board::new();
-    assert_eq!(board.len(), 81, "a board holds 81 cells");
+    assert_eq!(CELL_COUNT, 81, "a board holds 81 cells");
+    assert_eq!(board.get(0), Cell::Empty);
 }
 
 #[test]

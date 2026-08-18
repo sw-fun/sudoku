@@ -14,12 +14,14 @@ impl Board {
         }
     }
 
-    pub fn len(&self) -> usize {
-        self.cells.len()
+    /// Returns the cell at `idx` (0..81), row-major. Panics if out of range.
+    pub fn get(&self, idx: usize) -> Cell {
+        self.cells[idx]
     }
 
-    pub fn is_empty(&self) -> bool {
-        self.cells.iter().all(Cell::is_empty)
+    /// Sets the cell at `idx` (0..81), row-major. Panics if out of range.
+    pub fn set(&mut self, idx: usize, cell: Cell) {
+        self.cells[idx] = cell;
     }
 }
 

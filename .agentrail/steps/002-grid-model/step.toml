@@ -1,6 +1,6 @@
 number = 2
 slug = "grid-model"
-status = "pending"
+status = "in-progress"
 description = "TDD the grid model in crates/suduko-engine: Cell (given/user value 1..9 or em..."
 role = "production"
 context_files = []
