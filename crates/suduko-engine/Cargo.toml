@@ -1,0 +1,8 @@
+[package]
+name = "suduko-engine"
+description = "Pure Rust Sudoku engine: generation, solving, difficulty grading"
+edition.workspace = true
+version.workspace = true
+license.workspace = true
+
+[dependencies]

@@ -1,0 +1,10 @@
+#!/bin/sh
+# Validate every git-tracked markdown file with sw-markdown-checker.
+set -eu
+
+files=$(git ls-files '*.md')
+[ -z "$files" ] && exit 0
+
+for f in $files; do
+    sw-markdown-checker -f "$f"
+done

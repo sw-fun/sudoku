@@ -1,6 +1,6 @@
 number = 1
 slug = "repo-scaffold"
-status = "pending"
+status = "in-progress"
 description = "Create the Cargo workspace per docs/plan.md: crates/suduko-engine (pure Rust ..."
 role = "production"
 context_files = []
