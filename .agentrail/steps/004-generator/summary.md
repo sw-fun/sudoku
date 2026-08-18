@@ -1,0 +1,1 @@
+Generator TDD complete: dependency-free SplitMix64 RNG with pinned golden stream, randomized full-grid generation, and uniqueness-preserving clue digging with optional point symmetry and structural termination. Exact clue targets verified for 55/50/40; 17-target terminates fast with a unique puzzle. README updated. just check green; committed.
