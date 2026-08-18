@@ -1,7 +1,7 @@
 use std::time::Instant;
 
 use suduko_engine::generator::{self, DigParams};
-use suduko_engine::grid::{Board, CELL_COUNT, Cell};
+use suduko_engine::grid::{CELL_COUNT, Cell};
 use suduko_engine::solver;
 use suduko_engine::validate;
 

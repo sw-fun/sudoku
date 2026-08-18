@@ -1,10 +1,8 @@
-const ROWS: usize = 9;
 const COLS: usize = 9;
 
 pub fn row_of(idx: usize) -> usize {
     idx / COLS
 }
-
 pub fn col_of(idx: usize) -> usize {
     idx % COLS
 }

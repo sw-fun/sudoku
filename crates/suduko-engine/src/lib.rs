@@ -1,6 +1,7 @@
 pub mod format;
 pub mod game;
 pub mod generator;
+pub mod grader;
 pub mod grid;
 pub mod rng;
 pub mod solver;

@@ -45,6 +45,18 @@ Development is saga driven (AgentRail) and TDD.
   when the capped counter still proves a unique solution. Digging stops at
   `target_clues` or when every remaining clue is load-bearing, so it always
   terminates. Same seed, same puzzle.
+- `grader` - human-technique logical solver that always applies the cheapest
+  available technique from the ladder naked single, hidden single, locked
+  candidates (pointing/claiming), naked pair/triple, hidden pair/triple,
+  X-wing, swordfish, then a bounded-trial fallback (depth 8). `grade(board)`
+  reports per-technique counts, the hardest technique required, and a score
+  of `weight * 100 + total applications`, giving hundred-wide bands:
+  100-299 singles only, 300-399 locked candidates, 400-599 subsets,
+  600-799 fish, 800+ trial. Hidden subsets are rare in practice because a
+  hidden k-subset implies a complementary naked set that the ladder applies
+  first; the technique is pinned by crafted-mask tests (fires on a real
+  hidden pair, stays silent on a degenerate one), and a truth-tracking test
+  proves no elimination ever removes a solution digit.
 
 Cell values are stored as 1..=9; any other `Value` payload violates the
 documented invariant and is never produced by `parse` or generation.

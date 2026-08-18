@@ -1,6 +1,6 @@
 number = 5
 slug = "technique-grader"
-status = "pending"
+status = "in-progress"
 description = "TDD the human-technique grader: logical solver that always applies the cheape..."
 role = "production"
 context_files = []
