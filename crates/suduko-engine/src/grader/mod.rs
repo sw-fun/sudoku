@@ -20,9 +20,9 @@ const TRIAL_DEPTH: usize = 8;
 /// The score is `weight * 100 + applications` where the weight belongs to
 /// the hardest technique required, so scores stay inside hundred-wide bands:
 /// 100-299 singles only, 300-399 locked candidates, 400-599 subsets,
-/// 600-799 fish, 800+ requires trial and error.
+/// 600-699 XY-wing, 700-799 basic fish, 800+ requires trial and error.
 pub struct Grade {
-    pub counts: [usize; 8],
+    pub counts: [usize; 9],
     pub hardest: Option<Technique>,
     pub score: usize,
     pub solved: bool,
@@ -31,7 +31,7 @@ pub struct Grade {
 /// Grades a puzzle by solving it with the cheapest human technique first.
 pub fn grade(board: &Board) -> Grade {
     let mut cands = Candidates::from_board(board);
-    let mut counts = [0usize; 8];
+    let mut counts = [0usize; 9];
     let mut hardest: Option<Technique> = None;
     let solved;
     loop {

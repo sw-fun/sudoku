@@ -1,6 +1,6 @@
 number = 6
 slug = "difficulty-banding"
-status = "pending"
+status = "in-progress"
 description = "TDD difficulty targeting: define score bands and givens-count ranges for easy..."
 role = "production"
 context_files = []

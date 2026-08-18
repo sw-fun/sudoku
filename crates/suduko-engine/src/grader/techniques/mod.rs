@@ -2,6 +2,7 @@ pub mod fish;
 pub mod intersections;
 pub mod singles;
 pub mod subsets;
+pub mod xy_wing;
 
 use super::candidates::Candidates;
 use super::effect::Effect;
@@ -10,6 +11,7 @@ pub use fish::{swordfish, x_wing};
 pub use intersections::locked_candidates;
 pub use singles::{hidden_single, naked_single};
 pub use subsets::{hidden_set, naked_set};
+pub use xy_wing::xy_wing;
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub enum Technique {
@@ -18,9 +20,10 @@ pub enum Technique {
     LockedCandidates = 2,
     NakedSet = 3,
     HiddenSet = 4,
-    XWing = 5,
-    Swordfish = 6,
-    Trial = 7,
+    XYWing = 5,
+    XWing = 6,
+    Swordfish = 7,
+    Trial = 8,
 }
 
 impl Technique {
@@ -45,6 +48,9 @@ pub fn try_all(cands: &Candidates) -> Option<(Technique, Effect)> {
     }
     if let Some(e) = hidden_set(cands) {
         return Some((Technique::HiddenSet, e));
+    }
+    if let Some(e) = xy_wing(cands) {
+        return Some((Technique::XYWing, e));
     }
     if let Some(e) = x_wing(cands) {
         return Some((Technique::XWing, e));

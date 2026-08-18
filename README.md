@@ -48,15 +48,27 @@ Development is saga driven (AgentRail) and TDD.
 - `grader` - human-technique logical solver that always applies the cheapest
   available technique from the ladder naked single, hidden single, locked
   candidates (pointing/claiming), naked pair/triple, hidden pair/triple,
-  X-wing, swordfish, then a bounded-trial fallback (depth 8). `grade(board)`
-  reports per-technique counts, the hardest technique required, and a score
-  of `weight * 100 + total applications`, giving hundred-wide bands:
-  100-299 singles only, 300-399 locked candidates, 400-599 subsets,
-  600-799 fish, 800+ trial. Hidden subsets are rare in practice because a
-  hidden k-subset implies a complementary naked set that the ladder applies
-  first; the technique is pinned by crafted-mask tests (fires on a real
-  hidden pair, stays silent on a degenerate one), and a truth-tracking test
-  proves no elimination ever removes a solution digit.
+  XY-wing, X-wing, swordfish, then a bounded-trial fallback (depth 8).
+  `grade(board)` reports per-technique counts, the hardest technique
+  required, and a score of `weight * 100 + total applications`, giving
+  hundred-wide bands: 100-299 singles only, 300-399 locked candidates,
+  400-599 subsets, 600-699 XY-wing, 700-799 basic fish, 800+ trial. Hidden
+  subsets are rare in practice because a hidden k-subset implies a
+  complementary naked set that the ladder applies first; the technique is
+  pinned by crafted-mask tests (fires on a real hidden pair, stays silent on
+  a degenerate one), and a truth-tracking test proves no elimination ever
+  removes a solution digit.
+- `difficulty` - five published levels banded by the hardest technique
+  required: easy = singles only, medium = locked candidates, hard = naked or
+  hidden subsets, harder = XY-wing/X-wing/swordfish, hardest = beyond the
+  ladder (bounded trial). `generate(level, seed)` runs the acceptance loop:
+  fresh seeded grids, independent digs per grid, accept only in-band puzzles
+  with a clue count inside the level window (easy 38-55 down to hardest
+  22-30), failing closed with `LevelError::Exhausted` after the attempt
+  caps (24 digs x 3 grids). Same seed, same puzzle. Empirically the
+  "harder" tier exists because XY-wing (added as the common wing-class
+  technique) unlocks puzzles the basic-fish ladder would otherwise send to
+  trial; pure X-wing-required puzzles appear at roughly 1 per 80 deep digs.
 
 Cell values are stored as 1..=9; any other `Value` payload violates the
 documented invariant and is never produced by `parse` or generation.

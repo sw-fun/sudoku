@@ -39,3 +39,11 @@ pub fn generate_puzzle(seed: u64, params: DigParams) -> Puzzle {
     let clues = dig::dig(&full, params, &mut rng);
     Puzzle::new(clues, full).expect("dug clues always agree with the full grid")
 }
+
+/// Digs clues out of an existing full grid with its own seeded shuffle,
+/// preserving a unique solution. Used by the difficulty loop to draw many
+/// independent puzzles from one grid.
+pub fn dig_with(full: &Board, params: DigParams, seed: u64) -> Puzzle {
+    let clues = dig::dig(full, params, &mut Rng::new(seed));
+    Puzzle::new(clues, full.clone()).expect("dug clues always agree with the full grid")
+}

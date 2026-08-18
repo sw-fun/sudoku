@@ -141,6 +141,40 @@ fn hidden_pair_with_an_absent_digit_does_not_fire() {
 }
 
 #[test]
+fn xy_wing_removes_digit_seen_by_both_pincers() {
+    // Pivot 0 holds {1,2}; pincers 1 (row peer) holds {1,3} and 9 (column
+    // peer) holds {2,3}; cell 10 sees both pincers and must lose 3.
+    let c = cands(&[
+        (0, b(1) | b(2)),
+        (1, b(1) | b(3)),
+        (9, b(2) | b(3)),
+        (10, b(3) | b(7)),
+    ]);
+    match techniques::xy_wing(&c).expect("xy-wing applies") {
+        Effect::Eliminate { removals } => {
+            assert!(
+                removals.contains(&(10, 3)),
+                "sees both pincers: {removals:?}"
+            );
+            assert!(!removals.iter().any(|&(idx, _)| idx == 0));
+        }
+        other => panic!("expected eliminations, got {other:?}"),
+    }
+}
+
+#[test]
+fn xy_wing_ignores_pincers_that_cannot_hold_the_z_digit() {
+    // Pivot 0 holds {1,2}; pincer 1 holds {1,4} (no shared z), so no wing.
+    let c = cands(&[
+        (0, b(1) | b(2)),
+        (1, b(1) | b(4)),
+        (9, b(2) | b(3)),
+        (10, b(3)),
+    ]);
+    assert_eq!(techniques::xy_wing(&c), None);
+}
+
+#[test]
 fn x_wing_removes_digit_from_other_rows_in_the_two_columns() {
     // Digit 5 forms a rectangle: rows 0 and 4, cols 1 and 4.
     let mut spec: Vec<(usize, u16)> = vec![

@@ -1,3 +1,4 @@
+pub mod difficulty;
 pub mod format;
 pub mod game;
 pub mod generator;
