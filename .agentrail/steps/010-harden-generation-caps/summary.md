@@ -1,0 +1,1 @@
+Cap hardening done: default budget raised from 24x3 to 48 digs x 6 grids with a 14-seed red/green regression suite; measured zero exhaustion across a 50-seed sweep per level and worst wall 1.02s. difficulty-stats.md updated; the UI needs no seed-walk retry. Gate green; committed. Closes the sudoku-engine saga.

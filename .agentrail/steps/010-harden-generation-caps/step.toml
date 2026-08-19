@@ -1,8 +1,9 @@
 number = 10
 slug = "harden-generation-caps"
-status = "in-progress"
+status = "completed"
 description = "Reliability fix surfaced by engine acceptance: default difficulty caps (24 di..."
 role = "production"
 context_files = []
 created_at = "2026-08-18T16:30:32"
-commits = []
+completed_at = "2026-08-18T21:38:29"
+commits = ["052a438a84fcfe6cab33b9214f2168abb0f0e49a"]
