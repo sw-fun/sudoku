@@ -1,0 +1,11 @@
+[package]
+name = "suduko-techniques"
+edition.workspace = true
+version.workspace = true
+license.workspace = true
+
+[dependencies]
+suduko-grid = { path = "../suduko-grid" }
+
+[lints]
+workspace = true

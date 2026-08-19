@@ -1,0 +1,12 @@
+[package]
+name = "suduko-techniques-advanced"
+edition.workspace = true
+version.workspace = true
+license.workspace = true
+
+[dependencies]
+suduko-grid = { path = "../suduko-grid" }
+suduko-techniques = { path = "../suduko-techniques" }
+
+[lints]
+workspace = true

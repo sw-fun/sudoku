@@ -1,0 +1,16 @@
+[package]
+name = "suduko-ui"
+description = "Yew/WASM frontend for the Sudoku game"
+edition.workspace = true
+version.workspace = true
+license.workspace = true
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+wasm-bindgen = "0.2"
+yew = { version = "0.21", features = ["csr"] }
+
+[lints]
+workspace = true

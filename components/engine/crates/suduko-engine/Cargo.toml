@@ -1,0 +1,17 @@
+[package]
+name = "suduko-engine"
+edition.workspace = true
+version.workspace = true
+license.workspace = true
+
+[dependencies]
+suduko-grid = { path = "../suduko-grid" }
+suduko-generator = { path = "../suduko-generator" }
+suduko-grader = { path = "../suduko-grader" }
+suduko-solver = { path = "../suduko-solver" }
+
+[dev-dependencies]
+suduko-techniques = { path = "../suduko-techniques" }
+
+[lints]
+workspace = true

@@ -1,6 +1,6 @@
 number = 8
 slug = "decompose-engine-components"
-status = "pending"
+status = "in-progress"
 description = "Restructure per user direction and the sw-mlpl component pattern: replace the..."
 role = "production"
 context_files = []

@@ -28,16 +28,29 @@ direct-main commits, docs updated with behavior).
 
 ## Architecture
 
-Cargo workspace with two crates:
+Top-level component workspaces (the sw-mlpl pattern), each its own cargo
+workspace; one shared root `target/` via `.cargo/config.toml`; every
+cargo/trunk call serialized through `scripts/serial.sh`; `scripts/
+cargo-all.sh` runs one cargo command across all workspaces.
 
-- `crates/suduko-engine` - pure Rust, no WASM/browser dependencies.
-  Generation, solving, uniqueness, difficulty grading, and game-state
-  serialization. Every behavior lands via `cargo test` red/green cycles.
-- `crates/suduko-ui` - Yew/WASM application. Components, input handling,
-  highlighting, cookie persistence. All rules expressible without a browser
-  (state transitions, selection/highlight sets, win detection, cookie
-  round-trip) are implemented as pure functions or reducer-style logic in
-  modules with their own tests; Yew components stay thin.
+- `components/engine` - pure Rust, no WASM/browser dependencies.
+  - `suduko-grid` - board model, coords, serialization, Puzzle
+  - `suduko-solver` - backtracking solve + capped count (uniqueness)
+  - `suduko-generator` - seeded RNG, random full grids, safe digging
+  - `suduko-techniques` - candidates, effects, singles/intersections/
+    subsets
+  - `suduko-techniques-advanced` - XY-wing, X-wing, swordfish
+  - `suduko-grader` - ladder chain of responsibility, trial fallback,
+    grade
+  - `suduko-engine` - facade: Level, band config, generate dispatch
+- `components/ui` - `suduko-ui` Yew/WASM application. Components, input
+  handling, highlighting, cookie persistence. All rules expressible
+  without a browser (state transitions, selection/highlight sets, win
+  detection, cookie round-trip) are implemented as pure functions or
+  reducer-style logic in modules with their own tests; Yew components
+  stay thin. Served by `basic-http-server -a 0.0.0.0:9501` (Rust file
+  server; never Python).
+
 
 ## Engine design
 

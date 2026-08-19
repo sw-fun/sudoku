@@ -1,0 +1,8 @@
+[package]
+name = "suduko-grid"
+edition.workspace = true
+version.workspace = true
+license.workspace = true
+
+[lints]
+workspace = true

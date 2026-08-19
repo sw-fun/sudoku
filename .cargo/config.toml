@@ -1,0 +1,11 @@
+# Single shared target directory for the whole repo.
+#
+# Cargo discovers this config by walking up from the invocation
+# directory. Any `cargo` command -- whether run from a component
+# workspace under components/ or via scripts/cargo-all.sh -- resolves
+# to the same target/ tree at the repo root, keeping disk usage
+# bounded and cross-workspace incremental rebuilds cache-warm.
+# Concurrent cargo runs share the lock via scripts/serial.sh.
+
+[build]
+target-dir = "target"

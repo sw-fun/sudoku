@@ -1,0 +1,22 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/suduko-grid",
+    "crates/suduko-solver",
+    "crates/suduko-generator",
+    "crates/suduko-techniques",
+    "crates/suduko-techniques-advanced",
+    "crates/suduko-grader",
+    "crates/suduko-engine",
+]
+
+[workspace.package]
+edition = "2024"
+version = "0.1.0"
+license = "MIT"
+
+[workspace.lints.rust]
+unsafe_code = "forbid"
+
+[workspace.lints.clippy]
+pedantic = "warn"
