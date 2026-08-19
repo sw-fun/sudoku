@@ -120,6 +120,8 @@ puzzle is never singles-solvable (a hard board is never too easy).
 - Wrong-value detection compares user value against the stored solution;
   wrong cells render red and increment the bad-inputs counter on entry.
 - Input: keyboard 1..9 and spacebar via keydown; button pad 1..9 plus erase.
+  A pad button grays out and disables once all nine instances of its digit
+  are placed correctly (wrong placements never count; erasing reopens it).
 - Win detection: no empty cells and no wrong values -> flash animation,
   elapsed-time display, record stats, offer next board (different puzzle,
   same difficulty; generator rejects the previous puzzle seed).

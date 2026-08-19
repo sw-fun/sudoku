@@ -1,11 +1,14 @@
 //! Pure game state types and queries. Construction lives in `build`,
-//! input effects in `input`, highlight rules in `highlights`.
+//! input effects in `input`, highlight rules in `highlights`, digit
+//! completion in `complete`.
 
 mod build;
+mod complete;
 mod highlights;
 mod input;
 
 pub use build::from_strings;
+pub use complete::digit_complete;
 pub use highlights::highlight_set;
 pub use input::{Outcome, erase, set_value};
 

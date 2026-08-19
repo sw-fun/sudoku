@@ -1,4 +1,4 @@
-use suduko_game::{Game, erase, from_strings, highlight_set, set_value};
+use suduko_game::{Game, digit_complete, erase, from_strings, highlight_set, set_value};
 
 /// Wikipedia easy puzzle (singles-solvable) and its solution.
 const CLUES: &str =
@@ -92,6 +92,36 @@ fn wrong_cells_stay_wrong_until_corrected() {
     assert!(g.is_wrong(2));
     set_value(&mut g, 2, 4);
     assert!(!g.is_wrong(2));
+}
+
+#[test]
+fn ninth_correct_placement_completes_the_digit() {
+    let mut g = game();
+    // Digit 9 player cells in the fixture: 6, 29, 43, 48, 54
+    // (13, 19, 68, 80 are clues).
+    for &idx in &[6, 29, 43, 48] {
+        set_value(&mut g, idx, 9);
+    }
+    assert!(!digit_complete(&g, 9), "only eight 9s are placed");
+    set_value(&mut g, 54, 9);
+    assert!(digit_complete(&g, 9), "the ninth 9 completes the digit");
+    assert!(!digit_complete(&g, 1), "other digits stay incomplete");
+}
+
+#[test]
+fn wrong_or_erased_placements_do_not_complete_a_digit() {
+    let mut g = game();
+    for &idx in &[6, 29, 43, 48, 54] {
+        set_value(&mut g, idx, 9);
+    }
+    assert!(digit_complete(&g, 9));
+    erase(&mut g, 54);
+    assert!(!digit_complete(&g, 9), "erasing one 9 reopens the digit");
+    set_value(&mut g, 2, 9); // solution at r0c3 is 4: a wrong 9
+    assert!(
+        !digit_complete(&g, 9),
+        "wrong placements never count toward completion"
+    );
 }
 
 fn digit_at(s: &str, idx: usize) -> u8 {

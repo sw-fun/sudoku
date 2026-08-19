@@ -2,7 +2,7 @@
 //! and the win overlay.
 
 use suduko_engine::Level;
-use suduko_game::{Game, highlight_set};
+use suduko_game::{Game, digit_complete, highlight_set};
 use yew::prelude::*;
 
 fn label(level: Level) -> &'static str {
@@ -37,7 +37,7 @@ pub fn view_board(
                 </button>
             </header>
             { grid(game, &highlights, &on_select) }
-            { pad(&on_digit, &on_erase) }
+            { pad(game, &on_digit, &on_erase) }
             if game.won {
                 { overlay(game, &on_next, &on_menu) }
             }
@@ -85,16 +85,20 @@ fn cell(game: &Game, idx: usize, highlights: &[usize], on_select: &Callback<usiz
     }
 }
 
-fn pad(on_digit: &Callback<u8>, on_erase: &Callback<()>) -> Html {
+fn pad(game: &Game, on_digit: &Callback<u8>, on_erase: &Callback<()>) -> Html {
     html! {
         <div class="pad" data-testid="pad">
-            { for (1..=9u8).map(|d| html! {
-                <button
-                    class="pad-btn"
-                    data-testid={ format!("pad-{d}") }
-                    onclick={ on_digit.reform(move |_| d) }>
-                    { d }
-                </button>
+            { for (1..=9u8).map(|d| {
+                let done = digit_complete(game, d);
+                html! {
+                    <button
+                        class={ if done { "pad-btn done" } else { "pad-btn" } }
+                        data-testid={ format!("pad-{d}") }
+                        disabled={ done }
+                        onclick={ on_digit.reform(move |_| d) }>
+                        { d }
+                    </button>
+                }
             }) }
             <button class="pad-btn erase" data-testid="pad-erase" onclick={ on_erase.reform(|_| ()) }>
                 { "Erase" }

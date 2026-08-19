@@ -152,6 +152,13 @@ body {
   flex: 1.7 1 0;
 }
 
+.pad-btn:disabled {
+  background: #dde1e8;
+  border-color: #c3c9d4;
+  color: #98a0ad;
+  cursor: default;
+}
+
 .overlay {
   position: fixed;
   inset: 0;
