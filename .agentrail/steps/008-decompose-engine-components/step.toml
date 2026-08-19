@@ -1,8 +1,9 @@
 number = 8
 slug = "decompose-engine-components"
-status = "in-progress"
+status = "completed"
 description = "Restructure per user direction and the sw-mlpl component pattern: replace the..."
 role = "production"
 context_files = []
 created_at = "2026-08-18T17:11:12"
-commits = []
+completed_at = "2026-08-18T21:33:13"
+commits = ["8d93d6d2ce2d748ba6134608232f115720492e4a"]
