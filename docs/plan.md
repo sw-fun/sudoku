@@ -111,7 +111,9 @@ puzzle is never singles-solvable (a hard board is never too easy).
 
 ## UI design
 
-- Screens: menu (difficulty select + stats), game, solved overlay.
+- Screens: menu (difficulty select + stats), game, solved overlay. The
+  solved overlay stacks above the board (z-index above the selected cell)
+  so no board numbers show through the dialog.
 - Selection state: optional highlighted cell index.
 - Highlight sets computed by pure functions:
   - empty selected cell -> row, column, block peer set (light highlight).

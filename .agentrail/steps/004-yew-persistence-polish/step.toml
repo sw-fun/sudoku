@@ -1,4 +1,4 @@
-number = 3
+number = 4
 slug = "yew-persistence-polish"
 status = "in-progress"
 description = "Per docs/sagas.md step 2: versioned cookie persistence of game state (current..."
