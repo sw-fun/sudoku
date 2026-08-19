@@ -15,7 +15,7 @@ suduko-engine = { version = "0.1.0", path = "../../../engine/crates/suduko-engin
 suduko-game = { version = "0.1.0", path = "../suduko-game" }
 suduko-grid = { version = "0.1.0", path = "../../../engine/crates/suduko-grid" }
 wasm-bindgen = "0.2"
-web-sys = { version = "0.3.104", features = ["Window", "KeyboardEvent", "Event", "EventListener", "EventTarget"] }
+web-sys = { version = "0.3.104", features = ["Window", "Document", "Element", "KeyboardEvent", "Event", "EventListener", "EventTarget"] }
 yew = { version = "0.21", features = ["csr"] }
 
 [lints]

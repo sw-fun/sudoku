@@ -131,14 +131,15 @@ body {
 
 .pad {
   display: flex;
-  gap: 0.4rem;
+  gap: 0.35rem;
   justify-content: center;
   margin-top: 1rem;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
 }
 
 .pad-btn {
-  width: 3rem;
+  flex: 1 1 0;
+  min-width: 0;
   height: 3rem;
   font-size: 1.2rem;
   border: 1px solid #9db2d6;
@@ -148,7 +149,7 @@ body {
 }
 
 .pad-btn.erase {
-  width: 6rem;
+  flex: 1.7 1 0;
 }
 
 .overlay {
@@ -186,4 +187,41 @@ body {
 
 .win-flash {
   animation: winflash 1.2s linear 2;
+}
+
+.github-corner {
+  position: fixed;
+  top: 0;
+  right: 0;
+  z-index: 10;
+
+  svg {
+    display: block;
+    width: 80px;
+    height: 80px;
+    fill: #24292f;
+  }
+
+  .octo-arm,
+  .octo-body {
+    fill: #fff;
+  }
+
+  &:hover svg {
+    fill: #1663d9;
+  }
+}
+
+footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  gap: 1.25rem;
+  padding: 0.35rem 1rem;
+  background: #eef0f4;
+  color: #666;
+  font-size: 0.78rem;
 }

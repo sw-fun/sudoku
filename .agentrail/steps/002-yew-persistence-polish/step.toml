@@ -1,6 +1,6 @@
 number = 2
 slug = "yew-persistence-polish"
-status = "pending"
+status = "in-progress"
 description = "Per docs/sagas.md step 2: versioned cookie persistence of game state (current..."
 role = "validation"
 context_files = []
