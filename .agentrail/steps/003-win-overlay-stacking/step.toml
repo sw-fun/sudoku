@@ -1,8 +1,9 @@
 number = 3
 slug = "win-overlay-stacking"
-status = "in-progress"
+status = "completed"
 description = "Bug: on win, the solved overlay dialog renders below the last completed cell ..."
 role = "production"
 context_files = []
 created_at = "2026-08-19T16:36:18"
-commits = []
+completed_at = "2026-08-19T16:38:46"
+commits = ["c3add6e0ef73e632c214b2f8c604ce8e65510d34"]
