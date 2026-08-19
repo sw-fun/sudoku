@@ -1,8 +1,9 @@
 number = 1
 slug = "yew-playable-game"
-status = "in-progress"
+status = "completed"
 description = "Build the playable game per docs/sagas.md step 1: suduko-ui gains a pure TDD'..."
 role = "production"
 context_files = []
 created_at = "2026-08-18T21:39:03"
-commits = []
+completed_at = "2026-08-18T22:02:15"
+commits = ["683ef3e3152dc624017a437e5a463997195a8239"]
