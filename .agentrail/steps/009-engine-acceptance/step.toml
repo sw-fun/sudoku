@@ -1,6 +1,6 @@
 number = 9
 slug = "engine-acceptance"
-status = "pending"
+status = "in-progress"
 description = "Engine acceptance: run the full just check gate plus a large seeded sample ru..."
 role = "validation"
 context_files = []
