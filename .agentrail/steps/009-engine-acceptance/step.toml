@@ -1,8 +1,9 @@
 number = 9
 slug = "engine-acceptance"
-status = "in-progress"
+status = "completed"
 description = "Engine acceptance: run the full just check gate plus a large seeded sample ru..."
 role = "validation"
 context_files = []
 created_at = "2026-08-18T15:43:30"
-commits = []
+completed_at = "2026-08-18T21:36:14"
+commits = ["956c9081ed0fc3a4e1188372622426ee20e429e9"]
