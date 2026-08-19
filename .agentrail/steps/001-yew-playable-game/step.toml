@@ -1,0 +1,8 @@
+number = 1
+slug = "yew-playable-game"
+status = "in-progress"
+description = "Build the playable game per docs/sagas.md step 1: suduko-ui gains a pure TDD'..."
+role = "production"
+context_files = []
+created_at = "2026-08-18T21:39:03"
+commits = []

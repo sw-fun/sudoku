@@ -14,7 +14,7 @@ check:
 
 # Verify canonical formatting across all component workspaces.
 fmt-check:
-    ./scripts/cargo-all.sh fmt --all -- --check
+    ./scripts/cargo-all.sh fmt --all --check
 
 # Apply canonical formatting across all component workspaces.
 fmt:

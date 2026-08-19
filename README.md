@@ -2,6 +2,13 @@
 
 Browser-based Sudoku built with Rust, Yew, and WASM.
 
+**Play the live demo:** https://sw-fun.github.io/sudoku/ (built locally by
+`scripts/build-pages.sh` and pushed with `pages/`; no CI build).
+
+![Menu](docs/images/menu.png)
+
+![Board in play](docs/images/board-in-play.png)
+
 Development is saga driven (AgentRail) and TDD, decomposed into top-level
 component workspaces (the sw-mlpl pattern): each `components/*` directory
 is its own cargo workspace with small crates, sharing one root `target/`

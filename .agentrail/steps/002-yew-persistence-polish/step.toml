@@ -1,0 +1,8 @@
+number = 2
+slug = "yew-persistence-polish"
+status = "pending"
+description = "Per docs/sagas.md step 2: versioned cookie persistence of game state (current..."
+role = "validation"
+context_files = []
+created_at = "2026-08-18T21:39:03"
+commits = []

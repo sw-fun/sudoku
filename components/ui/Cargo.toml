@@ -1,6 +1,6 @@
 [workspace]
 resolver = "2"
-members = ["crates/suduko-ui"]
+members = ["crates/suduko-ui", "crates/suduko-game"]
 
 [workspace.package]
 edition = "2024"

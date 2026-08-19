@@ -1,6 +1,6 @@
-use yew::prelude::*;
+mod app;
+mod board;
+mod keys;
+mod menu;
 
-#[function_component(App)]
-pub fn app() -> Html {
-    html! { <main>{ "Suduko" }</main> }
-}
+pub use app::App;

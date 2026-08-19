@@ -435,6 +435,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "gloo-timers"
+version = "0.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "482ce8a491a501da4cd806bd190275363d674f2845005c6ddbd5d3e1dd54495d"
+dependencies = [
+ "js-sys",
+ "wasm-bindgen",
+]
+
+[[package]]
 name = "gloo-utils"
 version = "0.1.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -824,10 +834,76 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0c790de23124f9ab44544d7ac05d60440adc586479ce501c1d6d7da3cd8c9cf5"
 
 [[package]]
+name = "suduko-engine"
+version = "0.1.0"
+dependencies = [
+ "suduko-generator",
+ "suduko-grader",
+ "suduko-grid",
+ "suduko-solver",
+]
+
+[[package]]
+name = "suduko-game"
+version = "0.1.0"
+dependencies = [
+ "suduko-grid",
+]
+
+[[package]]
+name = "suduko-generator"
+version = "0.1.0"
+dependencies = [
+ "suduko-grid",
+ "suduko-solver",
+]
+
+[[package]]
+name = "suduko-grader"
+version = "0.1.0"
+dependencies = [
+ "suduko-grid",
+ "suduko-techniques",
+ "suduko-techniques-advanced",
+]
+
+[[package]]
+name = "suduko-grid"
+version = "0.1.0"
+
+[[package]]
+name = "suduko-solver"
+version = "0.1.0"
+dependencies = [
+ "suduko-grid",
+]
+
+[[package]]
+name = "suduko-techniques"
+version = "0.1.0"
+dependencies = [
+ "suduko-grid",
+]
+
+[[package]]
+name = "suduko-techniques-advanced"
+version = "0.1.0"
+dependencies = [
+ "suduko-grid",
+ "suduko-techniques",
+]
+
+[[package]]
 name = "suduko-ui"
 version = "0.1.0"
 dependencies = [
+ "gloo-timers 0.4.0",
+ "js-sys",
+ "suduko-engine",
+ "suduko-game",
+ "suduko-grid",
  "wasm-bindgen",
+ "web-sys",
  "yew",
 ]
 

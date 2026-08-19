@@ -1,0 +1,12 @@
+[package]
+name = "suduko-game"
+description = "Pure game-state rules for the Sudoku UI (no browser types)"
+edition.workspace = true
+version.workspace = true
+license.workspace = true
+
+[dependencies]
+suduko-grid = { path = "../../../engine/crates/suduko-grid" }
+
+[lints]
+workspace = true

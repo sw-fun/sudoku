@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="favicon.ico" />
+    <title>Suduko</title>
+    
+    <link rel="stylesheet" href="/sudoku/main-7cdf345a95e07b08.css" integrity="sha384-wk+ojD6B0m4nSVDzVJQSMO4mvSKTalyGLe37MU0U3wdgqSHIxrDXAhRv4v5an1vo"/>
+    
+<script type="module">
+import init, * as bindings from '/sudoku/suduko-ui-d7118ea844e30529.js';
+const wasm = await init({ module_or_path: '/sudoku/suduko-ui-d7118ea844e30529_bg.wasm' });
+
+
+window.wasmBindings = bindings;
+
+
+dispatchEvent(new CustomEvent("TrunkApplicationStarted", {detail: {wasm}}));
+
+</script>
+  <link rel="modulepreload" href="/sudoku/suduko-ui-d7118ea844e30529.js" crossorigin="anonymous" integrity="sha384-nR10i2In+O3b/0C8LZMlA8qqZNFWDPQthtcauxs2S+gMD21L6NOmu6ntP/ypVZnu"><link rel="preload" href="/sudoku/suduko-ui-d7118ea844e30529_bg.wasm" crossorigin="anonymous" integrity="sha384-r0m1xxHOKNmNldcx0O5Tzs8FOJD7cnt6yGVARQNpESY2z6qZuhaob0gVF9Vf2/T7" as="fetch" type="application/wasm"></head>
+  <body>
+    <footer>Suduko - built with Rust, Yew, and WASM</footer>
+  </body>
+</html>

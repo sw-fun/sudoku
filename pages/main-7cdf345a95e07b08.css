@@ -169,8 +169,7 @@ body {
 }
 
 @keyframes winflash {
-  0%,
-  100% {
+  0%, 100% {
     background: rgba(255, 255, 255, 0.85);
   }
   25% {
@@ -183,7 +182,6 @@ body {
     background: rgba(150, 255, 170, 0.95);
   }
 }
-
 .win-flash {
   animation: winflash 1.2s linear 2;
 }

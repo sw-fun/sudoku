@@ -1,0 +1,1 @@
+Per docs/sagas.md step 2: versioned cookie persistence of game state (current board, user values, level, elapsed, bad count, per-level stats), load on mount, save on change, corrupt-cookie tolerance (TDD the pure document codec; keep browser IO thin), final acceptance report in docs/, README refresh, just check green, commit, agentrail complete --done.
