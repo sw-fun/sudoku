@@ -75,10 +75,11 @@ pub fn clue_range(level: Level) -> std::ops::RangeInclusive<usize> {
 /// # Errors
 ///
 /// Returns `LevelError::Exhausted` when no accepted puzzle is found within
-/// the default attempt budget (24 digs x 3 grids).
+/// the default attempt budget (48 digs x 6 grids; sized so every seed in
+/// the acceptance sweeps accepts, worst observed wall under 5s).
 #[must_use = "generation is deterministic and expensive; use the result"]
 pub fn generate(level: Level, seed: u64) -> Result<Puzzle, LevelError> {
-    generate_bounded(level, seed, 24, 3)
+    generate_bounded(level, seed, 48, 6)
 }
 
 /// The acceptance loop: for up to `grid_attempts` fresh grids, draw up to

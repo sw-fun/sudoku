@@ -1,6 +1,6 @@
 number = 10
 slug = "harden-generation-caps"
-status = "pending"
+status = "in-progress"
 description = "Reliability fix surfaced by engine acceptance: default difficulty caps (24 di..."
 role = "production"
 context_files = []

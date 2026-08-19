@@ -34,3 +34,15 @@ distributional claims over all seeds. Yield estimates that informed the
 band design (about 46 percent singles, 16 percent locked, 5 percent
 subsets, 6 percent wings, 26 percent trial at dig target 26-28) came from
 80-480 seed scans recorded in the step 005-007 commit messages.
+
+## Cap hardening (step 010)
+
+The original default budget (24 digs x 3 grids = 72 attempts) exhausted on
+1 percent of medium, 6 percent of hard, and 7 percent of harder seeds
+(100-seed sweep, base 50000). The budget was raised to 48 digs x 6 grids
+(288 attempts) with a regression test pinning all fourteen recorded
+exhausting seeds (tests/reliability.rs; worst seed now accepts in well
+under 5s). A post-hardening 50-seed sweep per level measured zero
+exhaustion anywhere, with worst-case single-generation wall times of
+1.3 ms (easy), 492 ms (medium), 1.02 s (hard), 631 ms (harder), and
+102 ms (hardest). The UI therefore needs no seed-walk retry loop.
