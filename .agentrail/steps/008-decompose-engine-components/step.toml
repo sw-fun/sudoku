@@ -1,0 +1,8 @@
+number = 8
+slug = "decompose-engine-components"
+status = "pending"
+description = "Restructure per user direction and the sw-mlpl component pattern: replace the..."
+role = "production"
+context_files = []
+created_at = "2026-08-18T17:11:12"
+commits = []

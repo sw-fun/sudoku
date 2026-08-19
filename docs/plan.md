@@ -114,6 +114,9 @@ puzzle is never singles-solvable (a hard board is never too easy).
   always available.
 - Cookie persistence: versioned, compact state document; loaded on mount;
   written on every state change; tolerant of missing/corrupt cookies.
+- Serving: `trunk build` produces static WASM assets served by a Rust file
+  server only - `just serve` runs `basic-http-server -a 0.0.0.0:9501` (or an
+  equivalent in-repo Rust server script). Never Python.
 
 ## TDD and gates
 

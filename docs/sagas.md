@@ -42,7 +42,8 @@ levels are statistically separated and monotone; `just check` green.
 Purpose: build the Yew/WASM application on the accepted engine.
 
 1. `yew-shell` - app scaffold, build/run scripts, menu and game screens,
-   difficulty selection.
+   difficulty selection; `just serve` runs the built assets under
+   `basic-http-server -a 0.0.0.0:9501` (Rust file server, never Python).
 2. `board-render` - grid component, givens vs user values, selection
    highlight for row/column/block of an empty cell.
 3. `input-rules` - keyboard 1..9 and spacebar, button pad 1..9, erase button,
