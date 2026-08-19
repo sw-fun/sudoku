@@ -1,8 +1,9 @@
 number = 2
 slug = "number-button-disable"
-status = "in-progress"
+status = "completed"
 description = "When the 9th instance of a number is placed correctly on the board (all 9 of ..."
 role = "production"
 context_files = []
 created_at = "2026-08-19T15:40:55"
-commits = []
+completed_at = "2026-08-19T15:45:41"
+commits = ["0c8b9651ecb85d50ae9116f84baeef41f2b34535"]

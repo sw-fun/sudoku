@@ -1,0 +1,1 @@
+Added digit-completion pad disabling: pure digit_complete() in suduko-game (TDD red/green, 2 new tests), board pad renders disabled+grayed buttons for completed digits, erase reopens them; docs/plan.md updated, pages bundle rebuilt, just check + wasm build green, verified in-browser with playwright-cli.
