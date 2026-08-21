@@ -1,0 +1,1 @@
+Added licensing: MIT LICENSE file, single-line COPYRIGHT (both Copyright (c) 2026 Software Wrighter LLC), and a README License section; workspace manifests already declared license = MIT. just check green.
