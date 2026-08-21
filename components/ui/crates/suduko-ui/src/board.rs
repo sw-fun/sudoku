@@ -75,6 +75,7 @@ pub fn view_board(
     on_step: Callback<isize>,
     on_showme: Callback<()>,
     on_auto: Callback<bool>,
+    on_delay: Callback<u32>,
 ) -> Html {
     let highlights = highlight_set(game);
     let teaching = game.teaching.panel_open;
@@ -96,7 +97,7 @@ pub fn view_board(
             </header>
             { grid(game, &highlights, &on_select, teaching) }
             { if teaching {
-                crate::learn::learn_panel(game, &on_learn, &on_pick, &on_step, &on_auto)
+                crate::learn::learn_panel(game, &on_learn, &on_pick, &on_step, &on_auto, &on_delay)
             } else { html! {} } }
             { pad(game, &on_digit, &on_erase) }
             if game.won {

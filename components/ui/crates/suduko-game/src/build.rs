@@ -31,6 +31,8 @@ pub fn from_puzzle(puzzle: &Puzzle) -> Game {
         teaching: super::Teaching::default(),
         show_me: false,
         show_me_auto: false,
+        show_me_delay_ticks: 0,
+        show_me_wait: 0,
         eliminated: Vec::new(),
     }
 }

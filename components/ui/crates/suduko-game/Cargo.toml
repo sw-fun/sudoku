@@ -11,3 +11,6 @@ suduko-tutor = { path = "../../../tutor/crates/suduko-tutor" }
 
 [lints]
 workspace = true
+
+[dev-dependencies]
+suduko-engine = { path = "../../../engine/crates/suduko-engine" }

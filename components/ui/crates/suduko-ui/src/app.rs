@@ -23,6 +23,7 @@ pub(crate) enum Msg {
     LearnStep(isize),
     ShowMeToggle,
     ShowMeAuto(bool),
+    ShowMeDelay(u32),
 }
 
 pub(crate) struct Model {
@@ -72,9 +73,7 @@ impl Component for Model {
                 if !g.won {
                     g.elapsed_secs += 1;
                 }
-                if g.show_me && g.show_me_auto && !g.won {
-                    suduko_game::showme::advance(g);
-                }
+                suduko_game::showme::tick(g);
             }),
             Msg::Menu => {
                 self.screen = Screen::Menu;
@@ -101,6 +100,7 @@ impl Component for Model {
                 }
             }),
             Msg::ShowMeAuto(on) => self.mut_game(|g| g.show_me_auto = on),
+            Msg::ShowMeDelay(ticks) => self.mut_game(|g| g.show_me_delay_ticks = ticks),
         }
     }
 
@@ -121,6 +121,7 @@ impl Component for Model {
                     ctx.link().callback(|d: isize| Msg::LearnStep(d)),
                     ctx.link().callback(|_| Msg::ShowMeToggle),
                     ctx.link().callback(Msg::ShowMeAuto),
+                    ctx.link().callback(Msg::ShowMeDelay),
                 ),
                 None => view_menu(ctx.link(), &self.stats),
             },

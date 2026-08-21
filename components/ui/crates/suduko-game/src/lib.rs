@@ -1,18 +1,18 @@
 //! Pure game state types and queries. Construction lives in `build`,
-//! input effects in `input`, highlight rules in `highlights`, digit
+//! input effects and highlight rules in `input`, digit
 //! completion here, learn mode in `teaching`/`learn`, show-me solving
-//! in `showme`.
+//! in `showme` with the trial fallback in `trial`.
+
+pub mod showme;
 
 mod build;
-mod highlights;
 mod input;
 mod learn;
-pub mod showme;
 mod teaching;
+mod trial;
 
 pub use build::from_strings;
-pub use highlights::highlight_set;
-pub use input::{Outcome, clear_selected, entry, erase, set_value};
+pub use input::{Outcome, clear_selected, entry, erase, highlight_set, set_value};
 pub use learn::{Pulse, StepView};
 pub use teaching::Teaching;
 
@@ -46,6 +46,10 @@ pub struct Game {
     pub show_me: bool,
     /// Show-me advances automatically on the timer tick.
     pub show_me_auto: bool,
+    /// Extra ticks to wait between auto-advances.
+    pub show_me_delay_ticks: u32,
+    /// Ticks waited since the last auto-advance.
+    pub show_me_wait: u32,
     /// Solver eliminations: candidates removed but not yet placed.
     pub eliminated: Vec<(usize, u8)>,
 }

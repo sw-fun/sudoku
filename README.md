@@ -17,8 +17,10 @@ X-Wing, XY-Wing) and walks each one step by step with colored,
 animated highlighting - pattern cells outlined, involved rows/columns/
 blocks tinted, eliminated candidates pulsing red with strike-through,
 placements pulsing green. Show me mode has the game solve the board
-itself, applying and explaining one strategy at a time (auto or
-step-by-step).
+itself, applying and explaining one strategy at a time - auto with a
+speed selector (1s/3s/6s, manual Next pauses), or step-by-step; when
+the taught techniques run out it explains a trial placement, so even
+Hardest boards solve to the end.
 
 Development is saga driven (AgentRail) and TDD, decomposed into top-level
 component workspaces (the sw-mlpl pattern): each `components/*` directory

@@ -847,6 +847,7 @@ dependencies = [
 name = "suduko-game"
 version = "0.1.0"
 dependencies = [
+ "suduko-engine",
  "suduko-grid",
  "suduko-tutor",
 ]

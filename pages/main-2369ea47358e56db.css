@@ -304,6 +304,20 @@ body {
   font-size: 0.85rem;
 }
 
+.auto-controls {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.speed-select {
+  border: 1px solid #bbb;
+  border-radius: 6px;
+  background: #fff;
+  padding: 0.15rem 0.25rem;
+  font-size: 0.85rem;
+}
+
 .cell.selected {
   outline: 3px solid #222;
   outline-offset: -3px;

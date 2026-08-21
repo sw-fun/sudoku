@@ -137,7 +137,11 @@ puzzle is never singles-solvable (a hard board is never too easy).
   placements land on the board (via the normal input rules) and
   eliminations accumulate in a persistent solver layer that feeds
   pencil marks and future strategy discovery (`suduko-game::showme`);
-  an Auto checkbox rides the one-second tick until the board is won.
+  an Auto checkbox with a 1s/3s/6s speed selector (default 3s) rides
+  the tick, and a manual Next pauses Auto for step-wise control. When
+  the eight taught rungs are exhausted, a Trial fallback teaches a
+  solution-confirmed placement in the most constrained cell so show-me
+  finishes any level.
 - Selection state: optional highlighted cell index.
 - Highlight sets computed by pure functions:
   - empty selected cell -> row, column, block peer set (light highlight).

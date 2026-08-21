@@ -12,10 +12,11 @@ pub fn learn_panel(
     on_pick: &Callback<usize>,
     on_step: &Callback<isize>,
     on_auto: &Callback<bool>,
+    on_delay: &Callback<u32>,
 ) -> Html {
     match game.teaching.current() {
         None => picker(game, on_pick),
-        Some(_) => walkthrough(game, on_learn, on_step, on_auto),
+        Some(_) => walkthrough(game, on_learn, on_step, on_auto, on_delay),
     }
 }
 
@@ -43,6 +44,7 @@ fn walkthrough(
     on_learn: &Callback<()>,
     on_step: &Callback<isize>,
     on_auto: &Callback<bool>,
+    on_delay: &Callback<u32>,
 ) -> Html {
     let Some(annotation) = game.teaching.current() else {
         return html! {};
@@ -59,7 +61,7 @@ fn walkthrough(
                 { step.text.clone() }
             </div>
             <div class="walkthrough-progress">{ format!("step {} of {}", index + 1, last + 1) }</div>
-            { walkthrough_controls(game, index, last, on_learn, on_step, on_auto) }
+            { walkthrough_controls(game, index, last, on_learn, on_step, on_auto, on_delay) }
         </section>
     }
 }
@@ -107,19 +109,36 @@ pub(crate) fn marks_html(idx: usize, marks: &[Vec<u8>], view: Option<&StepView>)
     }
 }
 
-fn auto_toggle(game: &Game, on_auto: &Callback<bool>) -> Html {
+fn auto_toggle(game: &Game, on_auto: &Callback<bool>, on_delay: &Callback<u32>) -> Html {
     html! {
-        <label class="auto-label">
-            <input
-                type="checkbox"
-                data-testid="showme-auto"
-                checked={ game.show_me_auto }
-                onclick={ on_auto.reform(|e: MouseEvent| {
-                    let input: web_sys::HtmlInputElement = e.target_unchecked_into();
-                    input.checked()
-                }) } />
-            { "Auto" }
-        </label>
+        <span class="auto-controls">
+            <label class="auto-label">
+                <input
+                    type="checkbox"
+                    data-testid="showme-auto"
+                    checked={ game.show_me_auto }
+                    onclick={ on_auto.reform(|e: MouseEvent| {
+                        let input: web_sys::HtmlInputElement = e.target_unchecked_into();
+                        input.checked()
+                    }) } />
+                { "Auto" }
+            </label>
+            <select
+                class="speed-select"
+                data-testid="showme-speed"
+                onchange={ on_delay.reform(|e: Event| {
+                    let select: web_sys::HtmlSelectElement = e.target_unchecked_into();
+                    match select.value().as_str() {
+                        "1" => 0,
+                        "6" => 5,
+                        _ => 2,
+                    }
+                }) }>
+                <option value="1" selected={ game.show_me_delay_ticks == 0 }>{ "1s" }</option>
+                <option value="3" selected={ game.show_me_delay_ticks == 2 }>{ "3s" }</option>
+                <option value="6" selected={ game.show_me_delay_ticks == 5 }>{ "6s" }</option>
+            </select>
+        </span>
     }
 }
 
@@ -131,6 +150,7 @@ fn walkthrough_controls(
     on_learn: &Callback<()>,
     on_step: &Callback<isize>,
     on_auto: &Callback<bool>,
+    on_delay: &Callback<u32>,
 ) -> Html {
     html! {
         <div class="walkthrough-controls">
@@ -148,7 +168,7 @@ fn walkthrough_controls(
                     onclick={ on_step.reform(|_| 1) }>
                     { if index == last { "Apply & continue" } else { "Next" } }
                 </button>
-                { auto_toggle(game, on_auto) }
+                { auto_toggle(game, on_auto, on_delay) }
             } else {
                 <button
                     class="menu-btn"

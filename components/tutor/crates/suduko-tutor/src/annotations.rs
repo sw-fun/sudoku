@@ -13,6 +13,7 @@ pub enum Strategy {
     HiddenPair,
     XWing,
     XYWing,
+    Trial,
 }
 
 impl Strategy {
@@ -28,6 +29,7 @@ impl Strategy {
             Strategy::HiddenPair => 6,
             Strategy::XWing => 7,
             Strategy::XYWing => 8,
+            Strategy::Trial => 9,
         }
     }
 
@@ -43,6 +45,7 @@ impl Strategy {
             Strategy::HiddenPair => "Hidden Pair",
             Strategy::XWing => "X-Wing",
             Strategy::XYWing => "XY-Wing",
+            Strategy::Trial => "Trial",
         }
     }
 }

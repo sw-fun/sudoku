@@ -9,7 +9,7 @@ mod singles;
 mod x_wing;
 mod xy_wing;
 
-pub use annotations::{Annotation, Effect, Step, Strategy, UnitRef};
+pub use annotations::{Annotation, Effect, Step, Strategy, UnitRef, cell_name, name_list};
 pub use locked::{claiming_all, pointing_all};
 pub use pairs::{hidden_pairs, naked_pairs};
 pub use singles::{hidden_singles, naked_singles};

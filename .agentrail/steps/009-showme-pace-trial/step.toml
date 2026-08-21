@@ -1,0 +1,8 @@
+number = 9
+slug = "showme-pace-trial"
+status = "in-progress"
+description = "Show-me fixes from user feedback: (1) pacing - auto-advance defaults slower (..."
+role = "production"
+context_files = []
+created_at = "2026-08-21T11:19:04"
+commits = []

@@ -1,21 +1,22 @@
 //! Show-me solver mode: the game plays itself, strategy by strategy,
-//! applying each annotation's effect before moving to the next.
+//! applying each annotation's effect before moving to the next. When
+//! the taught techniques run out, the trial fallback keeps it going.
 
 use super::Game;
-use suduko_grid::CELL_COUNT;
 use suduko_tutor::Effect;
 
-/// Candidate state for the current board minus the elimination layer.
-fn tutor_candidates(game: &Game) -> suduko_tutor::Candidates {
-    suduko_tutor::candidates_with(&game.shown_values(), &game.eliminated)
-}
+/// Default extra ticks between auto-advances (2 => one step per 3s).
+const DEFAULT_DELAY_TICKS: u32 = 2;
 
 /// Starts show-me mode: open the panel on the current board and
 /// select the first (cheapest) strategy.
 pub fn start(game: &mut Game) {
     game.show_me = true;
     game.show_me_auto = true;
-    game.teaching.open(&tutor_candidates(game));
+    game.show_me_delay_ticks = DEFAULT_DELAY_TICKS;
+    game.show_me_wait = 0;
+    refresh_offers(game);
+    game.teaching.panel_open = true;
     game.teaching.select(0);
 }
 
@@ -41,12 +42,30 @@ pub fn advance(game: &mut Game) {
 }
 
 /// One walkthrough beat: step forward, or apply and continue when a
-/// show-me walkthrough sits at its last step (Back stays manual).
+/// show-me walkthrough sits at its last step. A manual forward step
+/// pauses Auto so the learner keeps control.
 pub fn step_or_apply(game: &mut Game, delta: isize) {
     if delta >= 0 && game.show_me {
+        if game.show_me_auto {
+            game.show_me_auto = false;
+        }
         advance(game);
     } else {
         game.teaching.step_by(delta);
+    }
+}
+
+/// One timer tick in show-me auto mode: waits out the delay, then
+/// advances one beat.
+pub fn tick(game: &mut Game) {
+    if !game.show_me || !game.show_me_auto || game.won {
+        return;
+    }
+    if game.show_me_wait >= game.show_me_delay_ticks {
+        game.show_me_wait = 0;
+        advance(game);
+    } else {
+        game.show_me_wait += 1;
     }
 }
 
@@ -69,21 +88,19 @@ pub fn apply(game: &mut Game) {
         stop(game);
         return;
     }
-    game.teaching.refresh(&tutor_candidates(game));
+    refresh_offers(game);
     game.teaching.select(0);
 }
 
-/// Pencil marks for a board minus an elimination layer.
-#[must_use]
-pub fn marks(shown: &[u8; CELL_COUNT], eliminated: &[(usize, u8)]) -> [Vec<u8>; CELL_COUNT] {
-    let cands = suduko_tutor::candidates_with(shown, eliminated);
-    core::array::from_fn(|idx| {
-        if !cands.placed[idx] {
-            (1..=9u8)
-                .filter(|d| cands.masks[idx] & (1 << (d - 1)) != 0)
-                .collect()
-        } else {
-            Vec::new()
-        }
-    })
+/// Recomputes offers; falls back to a taught trial placement when the
+/// taught techniques are exhausted.
+fn refresh_offers(game: &mut Game) {
+    let cands = suduko_tutor::candidates_with(&game.shown_values(), &game.eliminated);
+    game.teaching.refresh(&cands);
+    if game.teaching.offers().is_empty()
+        && !game.won
+        && let Some(trial) = super::trial::trial_annotation(game, &cands)
+    {
+        game.teaching.push_offer(trial);
+    }
 }

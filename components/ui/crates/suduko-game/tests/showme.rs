@@ -1,6 +1,6 @@
 //! Show-me solver mode: the game plays itself, strategy by strategy.
 
-use suduko_game::showme::{advance, apply, start, stop};
+use suduko_game::showme::{advance, apply, start, step_or_apply, stop, tick};
 use suduko_game::{Game, from_strings};
 
 /// Wikipedia easy clues and its solution (singles-solvable).
@@ -73,4 +73,66 @@ fn stopping_clears_solver_state_but_keeps_the_board() {
     stop(&mut g);
     assert!(!g.show_me && !g.teaching.panel_open && g.eliminated.is_empty());
     assert!(g.teaching.offers().is_empty());
+}
+
+#[test]
+fn auto_pace_respects_the_delay_counter() {
+    let mut g = solved_game();
+    start(&mut g);
+    assert_eq!(
+        g.show_me_delay_ticks, 2,
+        "default pace is one beat per three ticks"
+    );
+    let before = g.teaching.step_index;
+    tick(&mut g);
+    tick(&mut g);
+    assert_eq!(g.teaching.step_index, before, "delay ticks do not advance");
+    tick(&mut g);
+    assert_eq!(
+        g.teaching.step_index,
+        before + 1,
+        "the third tick advances one beat"
+    );
+}
+
+#[test]
+fn manual_next_pauses_auto() {
+    let mut g = solved_game();
+    start(&mut g);
+    assert!(g.show_me_auto);
+    step_or_apply(&mut g, 1);
+    assert!(!g.show_me_auto, "manual stepping takes over the pace");
+    let before = g.teaching.step_index;
+    tick(&mut g);
+    assert_eq!(g.teaching.step_index, before, "ticks idle once auto is off");
+    step_or_apply(&mut g, 1);
+    assert!(g.teaching.step_index > before || g.user.iter().any(|&v| v != 0));
+}
+
+#[test]
+fn trial_fallback_completes_a_hardest_board() {
+    let mut puzzle = None;
+    let mut seed = 20260821u64;
+    while puzzle.is_none() {
+        puzzle = suduko_engine::generate(suduko_engine::Level::Hardest, seed).ok();
+        seed += 977;
+    }
+    let mut g = Game::from_puzzle(&puzzle.expect("hardest puzzle"));
+    start(&mut g);
+    let mut trials = 0;
+    let mut guard = 0;
+    while !g.won {
+        if g.teaching
+            .current()
+            .is_some_and(|a| a.strategy == suduko_tutor::Strategy::Trial)
+        {
+            trials += 1;
+        }
+        advance(&mut g);
+        guard += 1;
+        assert!(guard < 5000, "trial show-me must terminate");
+    }
+    assert!(g.is_won());
+    assert!(trials > 0, "a hardest board needs the trial fallback");
+    assert!(!g.show_me);
 }

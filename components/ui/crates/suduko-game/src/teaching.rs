@@ -47,10 +47,11 @@ impl Teaching {
         self.selected.and_then(|i| self.offers.get(i))
     }
 
-    /// Opens the picker for a freshly computed board.
-    pub fn open(&mut self, cands: &Candidates) {
-        self.refresh(cands);
-        self.panel_open = true;
+    /// Appends an offer (used by the trial fallback) and selects it.
+    pub fn push_offer(&mut self, annotation: Annotation) {
+        self.offers.push(annotation);
+        self.selected = Some(self.offers.len() - 1);
+        self.step_index = 0;
     }
 
     /// Closes the panel and clears the walkthrough and offers.

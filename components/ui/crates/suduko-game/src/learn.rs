@@ -84,7 +84,8 @@ impl Game {
     /// Opens the learn panel with strategies for the current board.
     pub fn open_learn(&mut self) {
         let cands = suduko_tutor::candidates_with(&self.shown_values(), &self.eliminated);
-        self.teaching.open(&cands);
+        self.teaching.refresh(&cands);
+        self.teaching.panel_open = true;
     }
 
     /// Closes the learn panel and clears the walkthrough.
@@ -104,6 +105,21 @@ impl Game {
     /// Pencil marks for the current board (empty cells only).
     #[must_use]
     pub fn pencil_marks(&self) -> [Vec<u8>; CELL_COUNT] {
-        super::showme::marks(&self.shown_values(), &self.eliminated)
+        marks(&self.shown_values(), &self.eliminated)
     }
+}
+
+/// Pencil marks for a board minus an elimination layer.
+#[must_use]
+pub fn marks(shown: &[u8; CELL_COUNT], eliminated: &[(usize, u8)]) -> [Vec<u8>; CELL_COUNT] {
+    let cands = suduko_tutor::candidates_with(shown, eliminated);
+    core::array::from_fn(|idx| {
+        if !cands.placed[idx] {
+            (1..=9u8)
+                .filter(|d| cands.masks[idx] & (1 << (d - 1)) != 0)
+                .collect()
+        } else {
+            Vec::new()
+        }
+    })
 }
