@@ -1,0 +1,1 @@
+Board legibility fixes from user feedback: 1-9 row/column coordinate labels around the board (board-wrap grid, aligned via box-sizing:border-box) so teaching references like r6c1/'row 6' are locatable, and pencil marks enlarged to 0.7rem with darker color. Playwright-verified labels/alignment/font on a served build; docs/plan.md notes it; just check + wasm green; pages rebuilt.
