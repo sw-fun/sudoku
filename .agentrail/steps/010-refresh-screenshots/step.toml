@@ -1,8 +1,9 @@
 number = 10
 slug = "refresh-screenshots"
-status = "in-progress"
+status = "completed"
 description = "README screenshot refresh: (1) recapture docs/images/board-in-play.png so the..."
 role = "production"
 context_files = []
 created_at = "2026-08-21T12:32:40"
-commits = []
+completed_at = "2026-08-21T12:34:17"
+commits = ["641b36d35d93df02cb066e8720b3f0b73422b4e0"]
