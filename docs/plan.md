@@ -131,7 +131,13 @@ puzzle is never singles-solvable (a hard board is never too easy).
   involved units tinted green, focus digits emphasized in pencil marks,
   elimination candidates pulsing red with strike-through, and placement
   targets pulsing green (CSS keyframes; pure derivation in
-  `Game::step_view`).
+  `Game::step_view`). Show-me mode makes the game solve the current
+  board itself, strategy by strategy: a Show me toggle starts the
+  cheapest applicable walkthrough, Next turns into Apply-and-continue,
+  placements land on the board (via the normal input rules) and
+  eliminations accumulate in a persistent solver layer that feeds
+  pencil marks and future strategy discovery (`suduko-game::showme`);
+  an Auto checkbox rides the one-second tick until the board is won.
 - Selection state: optional highlighted cell index.
 - Highlight sets computed by pure functions:
   - empty selected cell -> row, column, block peer set (light highlight).

@@ -1,8 +1,7 @@
 //! Teaching (learn mode) state: strategy offers for the current
 //! board, the selected walkthrough, and its step cursor.
 
-use suduko_grid::CELL_COUNT;
-use suduko_tutor::{Annotation, find_all};
+use suduko_tutor::{Annotation, Candidates, find_all_in};
 
 /// Pure learn-mode state owned by the game.
 #[derive(Clone, Default)]
@@ -20,8 +19,8 @@ pub struct Teaching {
 impl Teaching {
     /// Recomputes the strategy list for `shown`; drops a selection
     /// that no longer exists and clamps the step cursor.
-    pub fn refresh(&mut self, shown: &[u8; CELL_COUNT]) {
-        self.offers = find_all(shown);
+    pub fn refresh(&mut self, cands: &Candidates) {
+        self.offers = find_all_in(cands);
         let keep = self
             .selected
             .is_some_and(|i| self.offers.as_slice().get(i).is_some());
@@ -49,16 +48,17 @@ impl Teaching {
     }
 
     /// Opens the picker for a freshly computed board.
-    pub fn open(&mut self, shown: &[u8; CELL_COUNT]) {
-        self.refresh(shown);
+    pub fn open(&mut self, cands: &Candidates) {
+        self.refresh(cands);
         self.panel_open = true;
     }
 
-    /// Closes the panel and clears the walkthrough.
+    /// Closes the panel and clears the walkthrough and offers.
     pub fn close(&mut self) {
         self.panel_open = false;
         self.selected = None;
         self.step_index = 0;
+        self.offers.clear();
     }
 
     /// Selects an offer by index (from the picker) and resets the

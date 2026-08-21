@@ -16,7 +16,9 @@ strategy currently applicable (singles, pointing/claiming, pairs,
 X-Wing, XY-Wing) and walks each one step by step with colored,
 animated highlighting - pattern cells outlined, involved rows/columns/
 blocks tinted, eliminated candidates pulsing red with strike-through,
-placements pulsing green.
+placements pulsing green. Show me mode has the game solve the board
+itself, applying and explaining one strategy at a time (auto or
+step-by-step).
 
 Development is saga driven (AgentRail) and TDD, decomposed into top-level
 component workspaces (the sw-mlpl pattern): each `components/*` directory

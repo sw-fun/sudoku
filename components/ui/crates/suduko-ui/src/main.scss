@@ -297,6 +297,15 @@ body {
 .walkthrough-controls {
   display: flex;
   gap: 0.5rem;
+  align-items: center;
+}
+
+.auto-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  color: #555;
+  font-size: 0.85rem;
 }
 
 .cell.selected {

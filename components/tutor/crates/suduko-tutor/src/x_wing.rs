@@ -6,13 +6,12 @@ use suduko_techniques::Candidates;
 
 /// Every X-Wing (basic fish of size 2) on the board.
 #[must_use]
-pub fn x_wings(shown: &[u8; CELL_COUNT]) -> Vec<Annotation> {
-    let cands = crate::candidates(shown);
+pub fn x_wings(cands: &Candidates) -> Vec<Annotation> {
     let mut out = Vec::new();
     for digit in 1u8..=9 {
         let bit = 1 << (digit - 1);
         for base_are_rows in [true, false] {
-            let positions = line_positions(&cands, bit, base_are_rows);
+            let positions = line_positions(cands, bit, base_are_rows);
             let eligible: Vec<usize> = (0..9).filter(|&l| positions[l].len() == 2).collect();
             for window in eligible.windows(2) {
                 let (l1, l2) = (window[0], window[1]);
@@ -31,7 +30,7 @@ pub fn x_wings(shown: &[u8; CELL_COUNT]) -> Vec<Annotation> {
                     })
                     .collect();
                 corners.sort_unstable();
-                let removals = x_removals(&cands, digit, &corners, &cross, base_are_rows);
+                let removals = x_removals(cands, digit, &corners, &cross, base_are_rows);
                 if removals.is_empty() {
                     continue;
                 }

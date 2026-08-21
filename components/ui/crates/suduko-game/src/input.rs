@@ -38,3 +38,17 @@ pub fn erase(game: &mut Game, idx: usize) {
         game.won = game.is_won();
     }
 }
+
+/// Enters `digit` into the selected cell, if one is selected.
+pub fn entry(game: &mut Game, digit: u8) {
+    if let Some(&sel) = game.selected.as_ref() {
+        set_value(game, sel, digit);
+    }
+}
+
+/// Erases the selected cell, if one is selected.
+pub fn clear_selected(game: &mut Game) {
+    if let Some(&sel) = game.selected.as_ref() {
+        erase(game, sel);
+    }
+}

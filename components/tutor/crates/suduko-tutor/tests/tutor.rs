@@ -5,8 +5,8 @@
 
 use suduko_grid::CELL_COUNT;
 use suduko_tutor::{
-    Effect, Strategy, UnitRef, claiming_all, find_all, hidden_pairs, hidden_singles, naked_pairs,
-    naked_singles, pointing_all, x_wings, xy_wings,
+    Effect, Strategy, UnitRef, candidates, claiming_all, find_all_in, hidden_pairs, hidden_singles,
+    naked_pairs, naked_singles, pointing_all, x_wings, xy_wings,
 };
 
 /// Wikipedia easy clues plus solution fills at idx 2,3,5,6,7.
@@ -30,7 +30,7 @@ fn removals(effect: &Effect) -> &[(usize, u8)] {
 
 #[test]
 fn naked_singles_place_the_last_candidate() {
-    let anns = naked_singles(&shown(BOARD));
+    let anns = naked_singles(&candidates(&shown(BOARD)));
     assert!(!anns.is_empty(), "mid-game board has naked singles");
     for a in &anns {
         let Effect::Place { idx, digit } = a.effect else {
@@ -44,7 +44,7 @@ fn naked_singles_place_the_last_candidate() {
 
 #[test]
 fn hidden_singles_confine_a_digit_to_one_cell_of_a_unit() {
-    let anns = hidden_singles(&shown(BOARD));
+    let anns = hidden_singles(&candidates(&shown(BOARD)));
     assert!(!anns.is_empty());
     for a in &anns {
         let Effect::Place { idx, digit } = a.effect else {
@@ -64,7 +64,7 @@ fn hidden_singles_confine_a_digit_to_one_cell_of_a_unit() {
 
 #[test]
 fn pointing_confines_a_block_digit_to_one_line() {
-    let anns = pointing_all(&shown(BOARD));
+    let anns = pointing_all(&candidates(&shown(BOARD)));
     let a = anns
         .iter()
         .find(|a| {
@@ -79,7 +79,7 @@ fn pointing_confines_a_block_digit_to_one_line() {
 
 #[test]
 fn claiming_confines_a_line_digit_to_one_block() {
-    let anns = claiming_all(&shown(BOARD));
+    let anns = claiming_all(&candidates(&shown(BOARD)));
     let a = anns
         .iter()
         .find(|a| {
@@ -97,7 +97,7 @@ fn claiming_confines_a_line_digit_to_one_block() {
 
 #[test]
 fn naked_pairs_strip_pair_digits_from_shared_units() {
-    let anns = naked_pairs(&shown(BOARD));
+    let anns = naked_pairs(&candidates(&shown(BOARD)));
     let row = anns
         .iter()
         .find(|a| a.units.contains(&UnitRef::Row(1)) && a.pattern == vec![10, 11])
@@ -117,7 +117,7 @@ fn naked_pairs_strip_pair_digits_from_shared_units() {
 
 #[test]
 fn hidden_pairs_strip_extras_from_the_pair_cells() {
-    let anns = hidden_pairs(&shown(BOARD));
+    let anns = hidden_pairs(&candidates(&shown(BOARD)));
     let a = anns
         .iter()
         .find(|a| a.digits == vec![1, 9] && a.pattern == vec![54, 56])
@@ -132,7 +132,7 @@ fn hidden_pairs_strip_extras_from_the_pair_cells() {
 
 #[test]
 fn x_wing_corners_confine_a_digit_to_two_lines() {
-    let anns = x_wings(&shown(BOARD));
+    let anns = x_wings(&candidates(&shown(BOARD)));
     let a = anns
         .iter()
         .find(|a| a.digits == vec![2] && a.pattern == vec![21, 23, 75, 77])
@@ -149,7 +149,7 @@ fn x_wing_corners_confine_a_digit_to_two_lines() {
 
 #[test]
 fn xy_wing_pincers_share_z_which_leaves_their_common_peers() {
-    let anns = xy_wings(&shown(BOARD));
+    let anns = xy_wings(&candidates(&shown(BOARD)));
     let a = anns
         .iter()
         .find(|a| a.pattern == vec![21, 22, 23] && a.digits == vec![2, 3, 4])
@@ -160,7 +160,7 @@ fn xy_wing_pincers_share_z_which_leaves_their_common_peers() {
 
 #[test]
 fn find_all_orders_by_ladder_rung_and_dedupes() {
-    let anns = find_all(&shown(BOARD));
+    let anns = find_all_in(&candidates(&shown(BOARD)));
     assert!(anns.len() > 10, "this board is rich: {}", anns.len());
     let rungs: Vec<u32> = anns.iter().map(|a| a.strategy.rung()).collect();
     let mut sorted = rungs.clone();

@@ -73,6 +73,8 @@ pub fn view_board(
     on_learn: Callback<()>,
     on_pick: Callback<usize>,
     on_step: Callback<isize>,
+    on_showme: Callback<()>,
+    on_auto: Callback<bool>,
 ) -> Html {
     let highlights = highlight_set(game);
     let teaching = game.teaching.panel_open;
@@ -85,12 +87,17 @@ pub fn view_board(
                 <button class="menu-btn learn-btn" data-testid="learn-btn" onclick={ on_learn.reform(|_| ()) }>
                     { if teaching { "Hide learning" } else { "Learn" } }
                 </button>
+                <button class="menu-btn showme-btn" data-testid="showme-btn" onclick={ on_showme.reform(|_| ()) }>
+                    { if game.show_me { "Stop show-me" } else { "Show me" } }
+                </button>
                 <button class="menu-btn" data-testid="menu-btn" onclick={ on_menu.reform(|_| ()) }>
                     { "Menu" }
                 </button>
             </header>
             { grid(game, &highlights, &on_select, teaching) }
-            { if teaching { crate::learn::learn_panel(game, &on_learn, &on_pick, &on_step) } else { html! {} } }
+            { if teaching {
+                crate::learn::learn_panel(game, &on_learn, &on_pick, &on_step, &on_auto)
+            } else { html! {} } }
             { pad(game, &on_digit, &on_erase) }
             if game.won {
                 { overlay(game, &on_next, &on_menu) }

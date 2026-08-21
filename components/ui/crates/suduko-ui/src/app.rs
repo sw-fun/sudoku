@@ -3,11 +3,11 @@
 
 use crate::board::view_board;
 use crate::keys::install_key_handler;
-use crate::menu::{next_seed, view_menu};
+use crate::menu::{next_seed, start_game, view_menu};
 use gloo_timers::callback::Interval;
 use std::collections::BTreeMap;
 use suduko_engine::Level;
-use suduko_game::{Game, erase, set_value};
+use suduko_game::{Game, clear_selected, entry};
 use yew::prelude::*;
 
 pub(crate) enum Msg {
@@ -21,6 +21,8 @@ pub(crate) enum Msg {
     LearnToggle,
     LearnSelect(usize),
     LearnStep(isize),
+    ShowMeToggle,
+    ShowMeAuto(bool),
 }
 
 pub(crate) struct Model {
@@ -64,19 +66,14 @@ impl Component for Model {
                 true
             }
             Msg::Select(idx) => self.mut_game(|g| g.select(idx)),
-            Msg::Digit(d) => self.mut_game(|g| {
-                if let Some(&sel) = g.selected.as_ref() {
-                    set_value(g, sel, d);
-                }
-            }),
-            Msg::Erase => self.mut_game(|g| {
-                if let Some(&sel) = g.selected.as_ref() {
-                    erase(g, sel);
-                }
-            }),
+            Msg::Digit(d) => self.mut_game(|g| entry(g, d)),
+            Msg::Erase => self.mut_game(clear_selected),
             Msg::Tick => self.mut_game(|g| {
                 if !g.won {
                     g.elapsed_secs += 1;
+                }
+                if g.show_me && g.show_me_auto && !g.won {
+                    suduko_game::showme::advance(g);
                 }
             }),
             Msg::Menu => {
@@ -93,7 +90,17 @@ impl Component for Model {
             }
             Msg::LearnToggle => self.mut_game(Game::toggle_learn),
             Msg::LearnSelect(idx) => self.mut_game(|g| g.teaching.select(idx)),
-            Msg::LearnStep(delta) => self.mut_game(|g| g.teaching.step_by(delta)),
+            Msg::LearnStep(delta) => {
+                self.mut_game(|g| suduko_game::showme::step_or_apply(g, delta))
+            }
+            Msg::ShowMeToggle => self.mut_game(|g| {
+                if g.show_me {
+                    suduko_game::showme::stop(g);
+                } else {
+                    suduko_game::showme::start(g);
+                }
+            }),
+            Msg::ShowMeAuto(on) => self.mut_game(|g| g.show_me_auto = on),
         }
     }
 
@@ -112,6 +119,8 @@ impl Component for Model {
                     ctx.link().callback(|_| Msg::LearnToggle),
                     ctx.link().callback(Msg::LearnSelect),
                     ctx.link().callback(|d: isize| Msg::LearnStep(d)),
+                    ctx.link().callback(|_| Msg::ShowMeToggle),
+                    ctx.link().callback(Msg::ShowMeAuto),
                 ),
                 None => view_menu(ctx.link(), &self.stats),
             },
@@ -139,18 +148,6 @@ impl Model {
             None => false,
         }
     }
-}
-
-/// Generates (with the documented seed walk) and starts a game.
-pub(crate) fn start_game(level: Level, seed: u64) -> Game {
-    let mut seed = seed;
-    let puzzle = loop {
-        match suduko_engine::generate(level, seed) {
-            Ok(p) => break p,
-            Err(_) => seed += 977,
-        }
-    };
-    Game::from_puzzle(&puzzle)
 }
 
 #[function_component(App)]

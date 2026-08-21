@@ -2,6 +2,7 @@
 
 use std::collections::BTreeMap;
 use suduko_engine::Level;
+use suduko_game::Game;
 use yew::html::Scope;
 use yew::prelude::*;
 
@@ -61,4 +62,16 @@ pub fn view_menu(link: &Scope<Model>, stats: &BTreeMap<Level, u32>) -> Html {
             <p class="hint">{ "Pick a difficulty to start. Escape returns here." }</p>
         </main>
     }
+}
+
+/// Generates (with the documented seed walk) and starts a game.
+pub(crate) fn start_game(level: Level, seed: u64) -> Game {
+    let mut seed = seed;
+    let puzzle = loop {
+        match suduko_engine::generate(level, seed) {
+            Ok(p) => break p,
+            Err(_) => seed += 977,
+        }
+    };
+    Game::from_puzzle(&puzzle)
 }

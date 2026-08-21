@@ -11,10 +11,11 @@ pub fn learn_panel(
     on_learn: &Callback<()>,
     on_pick: &Callback<usize>,
     on_step: &Callback<isize>,
+    on_auto: &Callback<bool>,
 ) -> Html {
     match game.teaching.current() {
         None => picker(game, on_pick),
-        Some(_) => walkthrough(game, on_learn, on_step),
+        Some(_) => walkthrough(game, on_learn, on_step, on_auto),
     }
 }
 
@@ -37,7 +38,12 @@ fn picker(game: &Game, on_pick: &Callback<usize>) -> Html {
     }
 }
 
-fn walkthrough(game: &Game, on_learn: &Callback<()>, on_step: &Callback<isize>) -> Html {
+fn walkthrough(
+    game: &Game,
+    on_learn: &Callback<()>,
+    on_step: &Callback<isize>,
+    on_auto: &Callback<bool>,
+) -> Html {
     let Some(annotation) = game.teaching.current() else {
         return html! {};
     };
@@ -53,28 +59,7 @@ fn walkthrough(game: &Game, on_learn: &Callback<()>, on_step: &Callback<isize>) 
                 { step.text.clone() }
             </div>
             <div class="walkthrough-progress">{ format!("step {} of {}", index + 1, last + 1) }</div>
-            <div class="walkthrough-controls">
-                <button
-                    class="menu-btn"
-                    data-testid="walkthrough-prev"
-                    disabled={ index == 0 }
-                    onclick={ on_step.reform(|_| -1) }>
-                    { "Back" }
-                </button>
-                <button
-                    class="menu-btn"
-                    data-testid="walkthrough-next"
-                    disabled={ index == last }
-                    onclick={ on_step.reform(|_| 1) }>
-                    { "Next" }
-                </button>
-                <button
-                    class="menu-btn"
-                    data-testid="walkthrough-close"
-                    onclick={ on_learn.reform(|_| ()) }>
-                    { "Close" }
-                </button>
-            </div>
+            { walkthrough_controls(game, index, last, on_learn, on_step, on_auto) }
         </section>
     }
 }
@@ -119,5 +104,66 @@ pub(crate) fn marks_html(idx: usize, marks: &[Vec<u8>], view: Option<&StepView>)
                 html! { <span class="mark empty">{ " " }</span> }
             }) }
         </span>
+    }
+}
+
+fn auto_toggle(game: &Game, on_auto: &Callback<bool>) -> Html {
+    html! {
+        <label class="auto-label">
+            <input
+                type="checkbox"
+                data-testid="showme-auto"
+                checked={ game.show_me_auto }
+                onclick={ on_auto.reform(|e: MouseEvent| {
+                    let input: web_sys::HtmlInputElement = e.target_unchecked_into();
+                    input.checked()
+                }) } />
+            { "Auto" }
+        </label>
+    }
+}
+
+#[allow(clippy::too_many_arguments)]
+fn walkthrough_controls(
+    game: &Game,
+    index: usize,
+    last: usize,
+    on_learn: &Callback<()>,
+    on_step: &Callback<isize>,
+    on_auto: &Callback<bool>,
+) -> Html {
+    html! {
+        <div class="walkthrough-controls">
+            <button
+                class="menu-btn"
+                data-testid="walkthrough-prev"
+                disabled={ index == 0 }
+                onclick={ on_step.reform(|_| -1) }>
+                { "Back" }
+            </button>
+            if game.show_me {
+                <button
+                    class="menu-btn"
+                    data-testid="walkthrough-next"
+                    onclick={ on_step.reform(|_| 1) }>
+                    { if index == last { "Apply & continue" } else { "Next" } }
+                </button>
+                { auto_toggle(game, on_auto) }
+            } else {
+                <button
+                    class="menu-btn"
+                    data-testid="walkthrough-next"
+                    disabled={ index == last }
+                    onclick={ on_step.reform(|_| 1) }>
+                    { "Next" }
+                </button>
+            }
+            <button
+                class="menu-btn"
+                data-testid="walkthrough-close"
+                onclick={ on_learn.reform(|_| ()) }>
+                { "Close" }
+            </button>
+        </div>
     }
 }

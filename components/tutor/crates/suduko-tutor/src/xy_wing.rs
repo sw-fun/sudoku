@@ -7,8 +7,7 @@ use suduko_techniques::Candidates;
 
 /// Every XY-Wing on the board.
 #[must_use]
-pub fn xy_wings(shown: &[u8; CELL_COUNT]) -> Vec<Annotation> {
-    let cands = crate::candidates(shown);
+pub fn xy_wings(cands: &Candidates) -> Vec<Annotation> {
     let bivalue: Vec<usize> = (0..CELL_COUNT)
         .filter(|&i| !cands.placed[i] && cands.masks[i].count_ones() == 2)
         .collect();
@@ -22,10 +21,10 @@ pub fn xy_wings(shown: &[u8; CELL_COUNT]) -> Vec<Annotation> {
                 if pb == pivot || pb == pa || !sees(pb, pivot) || !sees(pa, pb) {
                     continue;
                 }
-                let Some((dx, dy, dz)) = wing_digits(&cands, pivot, pa, pb) else {
+                let Some((dx, dy, dz)) = wing_digits(cands, pivot, pa, pb) else {
                     continue;
                 };
-                let removals = z_removals(&cands, pa, pb, dz);
+                let removals = z_removals(cands, pa, pb, dz);
                 if removals.is_empty() {
                     continue;
                 }

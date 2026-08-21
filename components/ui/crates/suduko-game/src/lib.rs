@@ -1,19 +1,19 @@
 //! Pure game state types and queries. Construction lives in `build`,
 //! input effects in `input`, highlight rules in `highlights`, digit
-//! completion in `complete`, learn mode in `teaching` and `learn`.
+//! completion here, learn mode in `teaching`/`learn`, show-me solving
+//! in `showme`.
 
 mod build;
-mod complete;
 mod highlights;
 mod input;
 mod learn;
+pub mod showme;
 mod teaching;
 
 pub use build::from_strings;
-pub use complete::digit_complete;
 pub use highlights::highlight_set;
-pub use input::{Outcome, erase, set_value};
-pub use learn::{Pulse, StepView, pencil_marks};
+pub use input::{Outcome, clear_selected, entry, erase, set_value};
+pub use learn::{Pulse, StepView};
 pub use teaching::Teaching;
 
 use suduko_grid::CELL_COUNT;
@@ -42,6 +42,12 @@ pub struct Game {
     pub elapsed_secs: u32,
     /// Learn-mode (teaching) state.
     pub teaching: Teaching,
+    /// Show-me solver mode active.
+    pub show_me: bool,
+    /// Show-me advances automatically on the timer tick.
+    pub show_me_auto: bool,
+    /// Solver eliminations: candidates removed but not yet placed.
+    pub eliminated: Vec<(usize, u8)>,
 }
 
 impl Game {
@@ -75,4 +81,13 @@ impl Game {
     pub fn is_won(&self) -> bool {
         (0..CELL_COUNT).all(|idx| self.shown(idx) == self.solution[idx])
     }
+}
+
+/// True when `digit` is correctly shown in all nine of its cells.
+/// Wrong placements never count; erasing reopens the digit.
+pub fn digit_complete(game: &Game, digit: u8) -> bool {
+    (0..CELL_COUNT)
+        .filter(|&idx| game.shown(idx) == digit && !game.is_wrong(idx))
+        .count()
+        == 9
 }

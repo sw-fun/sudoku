@@ -2,12 +2,11 @@
 
 use crate::all_units;
 use crate::annotations::{Annotation, Effect, Step, Strategy, UnitRef, cell_name, name_list};
-use suduko_grid::CELL_COUNT;
+use suduko_techniques::Candidates;
 
 /// Naked pairs: two cells of a unit sharing exactly two candidates.
 #[must_use]
-pub fn naked_pairs(shown: &[u8; CELL_COUNT]) -> Vec<Annotation> {
-    let cands = crate::candidates(shown);
+pub fn naked_pairs(cands: &Candidates) -> Vec<Annotation> {
     let mut out = Vec::new();
     for unit in all_units() {
         let two: Vec<usize> = unit
@@ -112,8 +111,7 @@ fn naked_steps(
 
 /// Hidden pairs: two digits of a unit confined to the same two cells.
 #[must_use]
-pub fn hidden_pairs(shown: &[u8; CELL_COUNT]) -> Vec<Annotation> {
-    let cands = crate::candidates(shown);
+pub fn hidden_pairs(cands: &Candidates) -> Vec<Annotation> {
     let mut out = Vec::new();
     for unit in all_units() {
         for da in 1u8..=9 {

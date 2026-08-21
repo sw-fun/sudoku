@@ -83,7 +83,8 @@ impl Game {
 
     /// Opens the learn panel with strategies for the current board.
     pub fn open_learn(&mut self) {
-        self.teaching.open(&self.shown_values());
+        let cands = suduko_tutor::candidates_with(&self.shown_values(), &self.eliminated);
+        self.teaching.open(&cands);
     }
 
     /// Closes the learn panel and clears the walkthrough.
@@ -103,21 +104,6 @@ impl Game {
     /// Pencil marks for the current board (empty cells only).
     #[must_use]
     pub fn pencil_marks(&self) -> [Vec<u8>; CELL_COUNT] {
-        pencil_marks(&self.shown_values())
+        super::showme::marks(&self.shown_values(), &self.eliminated)
     }
-}
-
-/// Pencil marks for a board: the candidate digits of each empty cell.
-#[must_use]
-pub fn pencil_marks(shown: &[u8; CELL_COUNT]) -> [Vec<u8>; CELL_COUNT] {
-    let cands = suduko_tutor::candidates(shown);
-    core::array::from_fn(|idx| {
-        if shown[idx] == 0 {
-            (1..=9u8)
-                .filter(|d| cands.masks[idx] & (1 << (d - 1)) != 0)
-                .collect()
-        } else {
-            Vec::new()
-        }
-    })
 }

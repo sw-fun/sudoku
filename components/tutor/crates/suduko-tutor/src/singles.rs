@@ -7,11 +7,10 @@ use suduko_techniques::Candidates;
 
 /// Every cell whose candidates collapsed to one digit.
 #[must_use]
-pub fn naked_singles(shown: &[u8; CELL_COUNT]) -> Vec<Annotation> {
-    let cands = crate::candidates(shown);
+pub fn naked_singles(cands: &Candidates) -> Vec<Annotation> {
     (0..CELL_COUNT)
-        .filter(|&idx| shown[idx] == 0 && cands.masks[idx].is_power_of_two())
-        .map(|idx| naked_one(&cands, idx))
+        .filter(|&idx| !cands.placed[idx] && cands.masks[idx].is_power_of_two())
+        .map(|idx| naked_one(cands, idx))
         .collect()
 }
 
@@ -67,8 +66,7 @@ fn naked_steps(idx: usize, digit: u8, units: [UnitRef; 3], blockers: &[usize]) -
 
 /// Every digit confined to one cell of a unit.
 #[must_use]
-pub fn hidden_singles(shown: &[u8; CELL_COUNT]) -> Vec<Annotation> {
-    let cands = crate::candidates(shown);
+pub fn hidden_singles(cands: &Candidates) -> Vec<Annotation> {
     let mut out = Vec::new();
     for unit in all_units() {
         for digit in 1u8..=9 {
@@ -76,10 +74,10 @@ pub fn hidden_singles(shown: &[u8; CELL_COUNT]) -> Vec<Annotation> {
             let spots: Vec<usize> = unit
                 .cells()
                 .into_iter()
-                .filter(|&i| shown[i] == 0 && cands.masks[i] & bit != 0)
+                .filter(|&i| !cands.placed[i] && cands.masks[i] & bit != 0)
                 .collect();
             if spots.len() == 1 {
-                out.push(hidden_one(&cands, spots[0], digit, unit));
+                out.push(hidden_one(cands, spots[0], digit, unit));
             }
         }
     }

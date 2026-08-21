@@ -2,13 +2,12 @@
 
 use crate::all_units;
 use crate::annotations::{Annotation, Effect, Step, Strategy, UnitRef, name_list};
-use suduko_grid::CELL_COUNT;
+use suduko_techniques::Candidates;
 
 /// Pointing: a digit confined to one line inside a block leaves that
 /// line everywhere else.
 #[must_use]
-pub fn pointing_all(shown: &[u8; CELL_COUNT]) -> Vec<Annotation> {
-    let cands = crate::candidates(shown);
+pub fn pointing_all(cands: &Candidates) -> Vec<Annotation> {
     let mut out = Vec::new();
     for unit in all_units() {
         let UnitRef::Block(block) = unit else {
@@ -125,8 +124,7 @@ fn pointing_steps(
 /// Claiming: a digit confined to one block inside a line leaves that
 /// block everywhere else.
 #[must_use]
-pub fn claiming_all(shown: &[u8; CELL_COUNT]) -> Vec<Annotation> {
-    let cands = crate::candidates(shown);
+pub fn claiming_all(cands: &Candidates) -> Vec<Annotation> {
     let mut out = Vec::new();
     for line in all_units() {
         let (UnitRef::Row(_) | UnitRef::Col(_)) = line else {

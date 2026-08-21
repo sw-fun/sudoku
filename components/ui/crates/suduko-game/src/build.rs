@@ -29,6 +29,9 @@ pub fn from_puzzle(puzzle: &Puzzle) -> Game {
         won: false,
         elapsed_secs: 0,
         teaching: super::Teaching::default(),
+        show_me: false,
+        show_me_auto: false,
+        eliminated: Vec::new(),
     }
 }
 
