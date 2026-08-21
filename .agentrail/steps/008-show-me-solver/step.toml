@@ -1,8 +1,9 @@
 number = 8
 slug = "show-me-solver"
-status = "in-progress"
+status = "completed"
 description = "Show-me mode: the game solves the current board step by step, teaching each s..."
 role = "production"
 context_files = []
 created_at = "2026-08-21T11:00:48"
-commits = []
+completed_at = "2026-08-21T11:11:46"
+commits = ["dc9d7b74f268cbda32a61c691287890f302ad253"]
