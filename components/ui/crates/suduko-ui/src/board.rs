@@ -82,18 +82,18 @@ pub fn view_board(
     html! {
         <main class="game" data-testid="game">
             <header class="game-header">
-                <span class="level" data-testid="level">{ label(level) }</span>
-                <span class="timer" data-testid="timer">{ format_time(game.elapsed_secs) }</span>
-                <span class="bad" data-testid="bad-count">{ format!("bad: {}", game.bad_inputs) }</span>
+                <button class="menu-btn" data-testid="menu-btn" onclick={ on_menu.reform(|_| ()) }>
+                    { "Menu" }
+                </button>
                 <button class="menu-btn learn-btn" data-testid="learn-btn" onclick={ on_learn.reform(|_| ()) }>
                     { if teaching { "Hide learning" } else { "Learn" } }
                 </button>
                 <button class="menu-btn showme-btn" data-testid="showme-btn" onclick={ on_showme.reform(|_| ()) }>
                     { if game.show_me { "Stop show-me" } else { "Show me" } }
                 </button>
-                <button class="menu-btn" data-testid="menu-btn" onclick={ on_menu.reform(|_| ()) }>
-                    { "Menu" }
-                </button>
+                <span class="level" data-testid="level">{ label(level) }</span>
+                <span class="timer" data-testid="timer">{ format_time(game.elapsed_secs) }</span>
+                <span class="bad" data-testid="bad-count">{ format!("bad: {}", game.bad_inputs) }</span>
             </header>
             { grid(game, &highlights, &on_select, teaching) }
             { if teaching {

@@ -115,7 +115,15 @@ puzzle is never singles-solvable (a hard board is never too easy).
   solved overlay stacks above the board (z-index above the selected cell)
   so no board numbers show through the dialog. The board carries row and
   column coordinate labels (1-9) so teaching references like "r6c1" and
-  "row 6" are locatable.
+  "row 6" are locatable. The layout is phone-fit: fluid cell sizing via
+  a viewport clamp keeps the whole board (labels included) on a 390px
+  screen with no horizontal scroll, the input pad and learn/show-me
+  panels stay within the game container, and the game header orders its
+  controls Menu, Learn, Show me, then the difficulty level at the right
+  end. `scripts/build-pages.sh` touches the UI build script before every
+  pages build so the footer's version/SHA/date/host provenance is always
+  current (the SHA reflects the commit being built, not the final pages
+  commit).
 - Teaching (learn mode): `components/tutor` is a separate pure workspace
   (`suduko-tutor`) whose finders return every applicable strategy for the
   current board - naked/hidden single, pointing/claiming, naked/hidden
