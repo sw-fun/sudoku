@@ -1,0 +1,8 @@
+number = 10
+slug = "refresh-screenshots"
+status = "in-progress"
+description = "README screenshot refresh: (1) recapture docs/images/board-in-play.png so the..."
+role = "production"
+context_files = []
+created_at = "2026-08-21T12:32:40"
+commits = []

@@ -9,7 +9,9 @@ Browser-based Sudoku built with Rust, Yew, and WASM.
 
 ![Board in play](docs/images/board-in-play.png)
 
-![Learning the X-Wing](docs/images/x-wing-walkthrough.png)
+![Learn mode](docs/images/learn-mode.png)
+
+![Show me](docs/images/show-me.png)
 
 Learn mode teaches solving strategies on the live board: it lists every
 strategy currently applicable (singles, pointing/claiming, pairs,
