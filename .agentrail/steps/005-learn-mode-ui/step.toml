@@ -1,0 +1,8 @@
+number = 5
+slug = "learn-mode-ui"
+status = "pending"
+description = "Learn mode part 1 (listing + pencil marks): suduko-game gains pure TDD'd teac..."
+role = "production"
+context_files = []
+created_at = "2026-08-20T18:35:23"
+commits = []

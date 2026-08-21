@@ -114,6 +114,12 @@ puzzle is never singles-solvable (a hard board is never too easy).
 - Screens: menu (difficulty select + stats), game, solved overlay. The
   solved overlay stacks above the board (z-index above the selected cell)
   so no board numbers show through the dialog.
+- Teaching (learn mode): `components/tutor` is a separate pure workspace
+  (`suduko-tutor`) whose finders return every applicable strategy for the
+  current board - naked/hidden single, pointing/claiming, naked/hidden
+  pair, X-Wing, XY-Wing - each with pattern cells, units, digits, the
+  safe inference (placement or eliminations), and ordered teaching steps;
+  `find_all` returns them ladder-ordered and deduplicated.
 - Selection state: optional highlighted cell index.
 - Highlight sets computed by pure functions:
   - empty selected cell -> row, column, block peer set (light highlight).

@@ -1,0 +1,13 @@
+[package]
+name = "suduko-tutor"
+description = "Annotated human-strategy finders for teaching (pure, no browser)"
+edition.workspace = true
+version.workspace = true
+license.workspace = true
+
+[dependencies]
+suduko-grid = { path = "../../../engine/crates/suduko-grid" }
+suduko-techniques = { path = "../../../engine/crates/suduko-techniques" }
+
+[lints]
+workspace = true
