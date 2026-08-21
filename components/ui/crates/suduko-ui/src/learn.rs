@@ -1,6 +1,7 @@
-//! Learn-mode panel: the strategy picker and the walkthrough shell.
+//! Learn-mode UI: the strategy picker, the walkthrough shell, and
+//! the per-step cell emphasis rendering.
 
-use suduko_game::Game;
+use suduko_game::{Game, StepView};
 use yew::prelude::*;
 
 /// The learn panel: picker when nothing is selected, walkthrough
@@ -75,5 +76,48 @@ fn walkthrough(game: &Game, on_learn: &Callback<()>, on_step: &Callback<isize>) 
                 </button>
             </div>
         </section>
+    }
+}
+
+pub(crate) fn step_classes(view: Option<&StepView>, idx: usize) -> Vec<&'static str> {
+    let Some(view) = view else {
+        return Vec::new();
+    };
+    let mut out = Vec::new();
+    if view.cells.contains(&idx) {
+        out.push("tutor-cell");
+    }
+    if view.units.iter().any(|u| u.cells().contains(&idx)) {
+        out.push("tutor-unit");
+    }
+    if view.pulse_cells.contains(&idx) {
+        out.push(match view.pulse {
+            suduko_game::Pulse::Red => "tutor-elim",
+            suduko_game::Pulse::Green => "tutor-place",
+        });
+    }
+    out
+}
+
+pub(crate) fn marks_html(idx: usize, marks: &[Vec<u8>], view: Option<&StepView>) -> Html {
+    let emphasis = view.and_then(|v| v.marks.get(&idx));
+    let striking =
+        view.is_some_and(|v| v.pulse_cells.contains(&idx) && v.pulse == suduko_game::Pulse::Red);
+    html! {
+        <span class="marks" data-testid={ format!("marks-{idx}") }>
+            { for (1..=9u8).map(|d| if marks[idx].contains(&d) {
+                let hot = emphasis.is_some_and(|e| e.contains(&d));
+                let strike = hot && striking;
+                if strike {
+                    html! { <span class="mark hot strike">{ d }</span> }
+                } else if hot {
+                    html! { <span class="mark hot">{ d }</span> }
+                } else {
+                    html! { <span class="mark">{ d }</span> }
+                }
+            } else {
+                html! { <span class="mark empty">{ " " }</span> }
+            }) }
+        </span>
     }
 }

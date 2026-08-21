@@ -9,6 +9,15 @@ Browser-based Sudoku built with Rust, Yew, and WASM.
 
 ![Board in play](docs/images/board-in-play.png)
 
+![Learning the X-Wing](docs/images/x-wing-walkthrough.png)
+
+Learn mode teaches solving strategies on the live board: it lists every
+strategy currently applicable (singles, pointing/claiming, pairs,
+X-Wing, XY-Wing) and walks each one step by step with colored,
+animated highlighting - pattern cells outlined, involved rows/columns/
+blocks tinted, eliminated candidates pulsing red with strike-through,
+placements pulsing green.
+
 Development is saga driven (AgentRail) and TDD, decomposed into top-level
 component workspaces (the sw-mlpl pattern): each `components/*` directory
 is its own cargo workspace with small crates, sharing one root `target/`

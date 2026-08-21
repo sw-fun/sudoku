@@ -13,7 +13,7 @@ pub use build::from_strings;
 pub use complete::digit_complete;
 pub use highlights::highlight_set;
 pub use input::{Outcome, erase, set_value};
-pub use learn::pencil_marks;
+pub use learn::{Pulse, StepView, pencil_marks};
 pub use teaching::Teaching;
 
 use suduko_grid::CELL_COUNT;

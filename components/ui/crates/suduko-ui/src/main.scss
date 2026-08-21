@@ -182,6 +182,66 @@ body {
   visibility: hidden;
 }
 
+.cell .mark.hot {
+  color: #1663d9;
+  font-weight: 700;
+}
+
+.cell.tutor-unit {
+  background: #e7f3ec;
+}
+
+.cell.tutor-cell {
+  background: #cfe8ff;
+  outline: 2px solid #1663d9;
+  outline-offset: -2px;
+  z-index: 1;
+}
+
+.cell.tutor-cell.tutor-unit {
+  background: #cfe8ff;
+}
+
+@keyframes tutorplace {
+  0%,
+  100% {
+    background: #cfe8ff;
+  }
+  50% {
+    background: #9fe0a8;
+  }
+}
+
+.cell.tutor-place {
+  background: #b8ecc0;
+  animation: tutorplace 1s ease-in-out infinite;
+  z-index: 1;
+}
+
+@keyframes tutorelim {
+  0%,
+  100% {
+    background: #ffe3e3;
+  }
+  50% {
+    background: #ffb3b3;
+  }
+}
+
+.cell.tutor-elim {
+  background: #ffd9d9;
+  animation: tutorelim 0.9s ease-in-out infinite;
+  z-index: 1;
+}
+
+.cell.tutor-elim .mark.hot {
+  color: #d91616;
+}
+
+.cell.tutor-elim .mark.strike {
+  text-decoration: line-through;
+}
+
 .learn {
   margin-top: 1rem;
   border: 1px solid #9db2d6;

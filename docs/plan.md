@@ -126,7 +126,12 @@ puzzle is never singles-solvable (a hard board is never too easy).
   current board, shows candidate pencil marks in empty cells (teaching
   only), lists every applicable strategy, and selecting one opens a
   step-by-step walkthrough shell (Back/Next/Close with clamped cursor);
-  the pure state lives in `suduko-game::Teaching`.
+  the pure state lives in `suduko-game::Teaching`. During a walkthrough
+  the board renders per-step emphasis: pattern cells outlined blue,
+  involved units tinted green, focus digits emphasized in pencil marks,
+  elimination candidates pulsing red with strike-through, and placement
+  targets pulsing green (CSS keyframes; pure derivation in
+  `Game::step_view`).
 - Selection state: optional highlighted cell index.
 - Highlight sets computed by pure functions:
   - empty selected cell -> row, column, block peer set (light highlight).

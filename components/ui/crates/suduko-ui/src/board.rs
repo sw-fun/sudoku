@@ -1,9 +1,55 @@
 //! Game screen: the board grid, input pad, timer, bad-input counter,
 //! the win overlay, and the learn (teaching) panel.
 
+use crate::learn::{marks_html, step_classes};
 use suduko_engine::Level;
-use suduko_game::{Game, digit_complete, highlight_set};
+use suduko_game::{Game, StepView, digit_complete, highlight_set};
 use yew::prelude::*;
+
+fn cell(
+    game: &Game,
+    idx: usize,
+    highlights: &[usize],
+    on_select: &Callback<usize>,
+    marks: Option<&[Vec<u8>]>,
+    view: Option<&StepView>,
+) -> Html {
+    let mut classes = vec!["cell"];
+    if game.is_given(idx) {
+        classes.push("given");
+    } else if game.shown(idx) != 0 {
+        classes.push("user");
+    }
+    if game.is_wrong(idx) {
+        classes.push("wrong");
+    }
+    if game.selected == Some(idx) {
+        classes.push("selected");
+    }
+    let step_classes = step_classes(view, idx);
+    if step_classes.is_empty() {
+        if highlights.contains(&idx) {
+            classes.push("hl");
+        }
+    } else {
+        classes.extend(step_classes);
+    }
+    let content = if game.shown(idx) != 0 {
+        html! { { game.shown(idx).to_string() } }
+    } else if let Some(marks) = marks {
+        marks_html(idx, marks, view)
+    } else {
+        html! { { " " } }
+    };
+    html! {
+        <button
+            class={ classes.join(" ") }
+            data-testid={ format!("cell-{idx}") }
+            onclick={ on_select.reform(move |_| idx) }>
+            { content }
+        </button>
+    }
+}
 
 fn label(level: Level) -> &'static str {
     match level {
@@ -59,6 +105,7 @@ fn grid(game: &Game, highlights: &[usize], on_select: &Callback<usize>, teaching
     } else {
         None
     };
+    let view = if teaching { game.step_view() } else { None };
     let cells = (0..81).map(|idx| {
         cell(
             game,
@@ -66,6 +113,7 @@ fn grid(game: &Game, highlights: &[usize], on_select: &Callback<usize>, teaching
             highlights,
             on_select,
             marks.as_ref().map(|m| &m[..]),
+            view.as_ref(),
         )
     });
     html! {
@@ -81,54 +129,6 @@ fn grid(game: &Game, highlights: &[usize], on_select: &Callback<usize>, teaching
                 { for cells }
             </div>
         </div>
-    }
-}
-
-fn cell(
-    game: &Game,
-    idx: usize,
-    highlights: &[usize],
-    on_select: &Callback<usize>,
-    marks: Option<&[Vec<u8>]>,
-) -> Html {
-    let mut classes = vec!["cell"];
-    if game.is_given(idx) {
-        classes.push("given");
-    } else if game.shown(idx) != 0 {
-        classes.push("user");
-    }
-    if game.is_wrong(idx) {
-        classes.push("wrong");
-    }
-    if game.selected == Some(idx) {
-        classes.push("selected");
-    }
-    if highlights.contains(&idx) {
-        classes.push("hl");
-    }
-    let shown = game.shown(idx);
-    let content = if shown != 0 {
-        html! { { shown.to_string() } }
-    } else if let Some(marks) = marks {
-        html! {
-            <span class="marks" data-testid={ format!("marks-{idx}") }>
-                { for (1..=9u8).map(|d| if marks[idx].contains(&d) {
-                    html! { <span class="mark">{ d }</span> }
-                } else {
-                    html! { <span class="mark empty">{ " " }</span> }
-                }) }
-            </span>
-        }
-    } else {
-        html! { { " " } }
-    };
-    html! {
-        <button
-            class={ classes.join(" ") }
-            data-testid={ format!("cell-{idx}") }
-            onclick={ on_select.reform(move |_| idx) }>
-            { content }
-        </button>
     }
 }
 
