@@ -1,8 +1,9 @@
 number = 5
 slug = "learn-mode-ui"
-status = "pending"
+status = "completed"
 description = "Learn mode part 1 (listing + pencil marks): suduko-game gains pure TDD'd teac..."
 role = "production"
 context_files = []
 created_at = "2026-08-20T18:35:23"
-commits = []
+completed_at = "2026-08-20T19:25:35"
+commits = ["243e1d79f9d3ef6b7064a78d92affb4e5fff56f3"]
