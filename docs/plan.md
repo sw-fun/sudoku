@@ -113,7 +113,9 @@ puzzle is never singles-solvable (a hard board is never too easy).
 
 - Screens: menu (difficulty select + stats), game, solved overlay. The
   solved overlay stacks above the board (z-index above the selected cell)
-  so no board numbers show through the dialog.
+  so no board numbers show through the dialog. The board carries row and
+  column coordinate labels (1-9) so teaching references like "r6c1" and
+  "row 6" are locatable.
 - Teaching (learn mode): `components/tutor` is a separate pure workspace
   (`suduko-tutor`) whose finders return every applicable strategy for the
   current board - naked/hidden single, pointing/claiming, naked/hidden
