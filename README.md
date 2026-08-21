@@ -77,3 +77,10 @@ in `suduko-engine` tests; measured tables and methodology are in
 - Delivery plan: `docs/plan.md`
 - Saga queue: `docs/sagas.md`
 - Agent rules: `AGENTS.md`
+
+## License
+
+Copyright (c) 2026 Software Wrighter LLC
+
+MIT License; see [LICENSE](LICENSE) for the full text and
+[COPYRIGHT](COPYRIGHT) for the notice.
