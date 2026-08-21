@@ -58,12 +58,31 @@ body {
   margin: 1rem auto;
 }
 
+/* On phone widths the game column runs under the fixed github corner
+   (80px tall, top-right); start the header below it so no content
+   hides behind the octocat. */
+@media (max-width: 560px) {
+  .game {
+    margin-top: 4.75rem;
+  }
+}
+
 .game-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  margin-bottom: 0.8rem;
+}
+
+.header-btns,
+.header-stats {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  margin-bottom: 0.8rem;
-  flex-wrap: wrap;
+}
+
+.header-stats {
+  gap: 1rem;
 }
 
 .menu-btn {
@@ -88,7 +107,7 @@ body {
   cursor: pointer;
 }
 
-.game-header .level {
+.game-header .header-stats .level {
   margin-left: auto;
 }
 

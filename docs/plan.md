@@ -163,8 +163,12 @@ puzzle is never singles-solvable (a hard board is never too easy).
 - Win detection: no empty cells and no wrong values -> flash animation,
   elapsed-time display, record stats, offer next board (different puzzle,
   same difficulty; generator rejects the previous puzzle seed).
-- Escape on the game screen returns to difficulty and stats; menu button is
-  always available.
+- Escape on the game screen returns to difficulty and stats (keyboard
+  devices only; the menu hint does not advertise it on touch screens);
+  the menu button is always available.
+- Game header on narrow screens sits below the fixed github corner,
+  buttons (Menu/Learn/Show me) on the first line and level/timer/bad
+  count on the second.
 - Cookie persistence: versioned, compact state document; loaded on mount;
   written on every state change; tolerant of missing/corrupt cookies.
 - Serving: `trunk build` produces static WASM assets served by a Rust file

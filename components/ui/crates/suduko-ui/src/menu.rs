@@ -59,7 +59,7 @@ pub fn view_menu(link: &Scope<Model>, stats: &BTreeMap<Level, u32>) -> Html {
                     }
                 }) }
             </div>
-            <p class="hint">{ "Pick a difficulty to start. Escape returns here." }</p>
+            <p class="hint">{ "Pick a difficulty to start." }</p>
         </main>
     }
 }
