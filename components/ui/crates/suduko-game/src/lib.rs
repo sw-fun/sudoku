@@ -1,16 +1,20 @@
 //! Pure game state types and queries. Construction lives in `build`,
 //! input effects in `input`, highlight rules in `highlights`, digit
-//! completion in `complete`.
+//! completion in `complete`, learn mode in `teaching` and `learn`.
 
 mod build;
 mod complete;
 mod highlights;
 mod input;
+mod learn;
+mod teaching;
 
 pub use build::from_strings;
 pub use complete::digit_complete;
 pub use highlights::highlight_set;
 pub use input::{Outcome, erase, set_value};
+pub use learn::pencil_marks;
+pub use teaching::Teaching;
 
 use suduko_grid::CELL_COUNT;
 
@@ -36,6 +40,8 @@ pub struct Game {
     pub won: bool,
     /// Seconds elapsed on this board.
     pub elapsed_secs: u32,
+    /// Learn-mode (teaching) state.
+    pub teaching: Teaching,
 }
 
 impl Game {

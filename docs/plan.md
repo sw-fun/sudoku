@@ -119,7 +119,12 @@ puzzle is never singles-solvable (a hard board is never too easy).
   current board - naked/hidden single, pointing/claiming, naked/hidden
   pair, X-Wing, XY-Wing - each with pattern cells, units, digits, the
   safe inference (placement or eliminations), and ordered teaching steps;
-  `find_all` returns them ladder-ordered and deduplicated.
+  `find_all` returns them ladder-ordered and deduplicated. The game
+  screen has a Learn toggle: opening it computes the offers for the
+  current board, shows candidate pencil marks in empty cells (teaching
+  only), lists every applicable strategy, and selecting one opens a
+  step-by-step walkthrough shell (Back/Next/Close with clamped cursor);
+  the pure state lives in `suduko-game::Teaching`.
 - Selection state: optional highlighted cell index.
 - Highlight sets computed by pure functions:
   - empty selected cell -> row, column, block peer set (light highlight).

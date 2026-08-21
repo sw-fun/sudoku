@@ -1,5 +1,5 @@
 //! Game screen: the board grid, input pad, timer, bad-input counter,
-//! and the win overlay.
+//! the win overlay, and the learn (teaching) panel.
 
 use suduko_engine::Level;
 use suduko_game::{Game, digit_complete, highlight_set};
@@ -24,19 +24,27 @@ pub fn view_board(
     on_erase: Callback<()>,
     on_menu: Callback<()>,
     on_next: Callback<()>,
+    on_learn: Callback<()>,
+    on_pick: Callback<usize>,
+    on_step: Callback<isize>,
 ) -> Html {
     let highlights = highlight_set(game);
+    let teaching = game.teaching.panel_open;
     html! {
         <main class="game" data-testid="game">
             <header class="game-header">
                 <span class="level" data-testid="level">{ label(level) }</span>
                 <span class="timer" data-testid="timer">{ format_time(game.elapsed_secs) }</span>
                 <span class="bad" data-testid="bad-count">{ format!("bad: {}", game.bad_inputs) }</span>
+                <button class="menu-btn learn-btn" data-testid="learn-btn" onclick={ on_learn.reform(|_| ()) }>
+                    { if teaching { "Hide learning" } else { "Learn" } }
+                </button>
                 <button class="menu-btn" data-testid="menu-btn" onclick={ on_menu.reform(|_| ()) }>
                     { "Menu" }
                 </button>
             </header>
-            { grid(game, &highlights, &on_select) }
+            { grid(game, &highlights, &on_select, teaching) }
+            { if teaching { crate::learn::learn_panel(game, &on_learn, &on_pick, &on_step) } else { html! {} } }
             { pad(game, &on_digit, &on_erase) }
             if game.won {
                 { overlay(game, &on_next, &on_menu) }
@@ -45,15 +53,26 @@ pub fn view_board(
     }
 }
 
-fn grid(game: &Game, highlights: &[usize], on_select: &Callback<usize>) -> Html {
+fn grid(game: &Game, highlights: &[usize], on_select: &Callback<usize>, teaching: bool) -> Html {
+    let marks = if teaching {
+        Some(game.pencil_marks())
+    } else {
+        None
+    };
     html! {
         <div class="board" data-testid="board">
-            { for (0..81).map(|idx| cell(game, idx, highlights, on_select)) }
+            { for (0..81).map(|idx| cell(game, idx, highlights, on_select, marks.as_ref().map(|m| &m[..]))) }
         </div>
     }
 }
 
-fn cell(game: &Game, idx: usize, highlights: &[usize], on_select: &Callback<usize>) -> Html {
+fn cell(
+    game: &Game,
+    idx: usize,
+    highlights: &[usize],
+    on_select: &Callback<usize>,
+    marks: Option<&[Vec<u8>]>,
+) -> Html {
     let mut classes = vec!["cell"];
     if game.is_given(idx) {
         classes.push("given");
@@ -70,17 +89,27 @@ fn cell(game: &Game, idx: usize, highlights: &[usize], on_select: &Callback<usiz
         classes.push("hl");
     }
     let shown = game.shown(idx);
-    let text = if shown == 0 {
-        " ".to_string()
+    let content = if shown != 0 {
+        html! { { shown.to_string() } }
+    } else if let Some(marks) = marks {
+        html! {
+            <span class="marks" data-testid={ format!("marks-{idx}") }>
+                { for (1..=9u8).map(|d| if marks[idx].contains(&d) {
+                    html! { <span class="mark">{ d }</span> }
+                } else {
+                    html! { <span class="mark empty">{ " " }</span> }
+                }) }
+            </span>
+        }
     } else {
-        shown.to_string()
+        html! { { " " } }
     };
     html! {
         <button
             class={ classes.join(" ") }
             data-testid={ format!("cell-{idx}") }
             onclick={ on_select.reform(move |_| idx) }>
-            { text }
+            { content }
         </button>
     }
 }

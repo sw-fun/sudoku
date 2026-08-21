@@ -18,6 +18,9 @@ pub(crate) enum Msg {
     Tick,
     Menu,
     NextBoard,
+    LearnToggle,
+    LearnSelect(usize),
+    LearnStep(isize),
 }
 
 pub(crate) struct Model {
@@ -88,6 +91,9 @@ impl Component for Model {
                 }
                 true
             }
+            Msg::LearnToggle => self.mut_game(Game::toggle_learn),
+            Msg::LearnSelect(idx) => self.mut_game(|g| g.teaching.select(idx)),
+            Msg::LearnStep(delta) => self.mut_game(|g| g.teaching.step_by(delta)),
         }
     }
 
@@ -103,6 +109,9 @@ impl Component for Model {
                     ctx.link().callback(|_| Msg::Erase),
                     ctx.link().callback(|_| Msg::Menu),
                     ctx.link().callback(|_| Msg::NextBoard),
+                    ctx.link().callback(|_| Msg::LearnToggle),
+                    ctx.link().callback(Msg::LearnSelect),
+                    ctx.link().callback(|d: isize| Msg::LearnStep(d)),
                 ),
                 None => view_menu(ctx.link(), &self.stats),
             },

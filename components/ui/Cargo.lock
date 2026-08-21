@@ -848,6 +848,7 @@ name = "suduko-game"
 version = "0.1.0"
 dependencies = [
  "suduko-grid",
+ "suduko-tutor",
 ]
 
 [[package]]
@@ -894,6 +895,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "suduko-tutor"
+version = "0.1.0"
+dependencies = [
+ "suduko-grid",
+ "suduko-techniques",
+]
+
+[[package]]
 name = "suduko-ui"
 version = "0.1.0"
 dependencies = [
@@ -902,6 +911,7 @@ dependencies = [
  "suduko-engine",
  "suduko-game",
  "suduko-grid",
+ "suduko-tutor",
  "wasm-bindgen",
  "web-sys",
  "yew",

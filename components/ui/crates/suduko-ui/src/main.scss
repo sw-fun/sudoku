@@ -123,6 +123,83 @@ body {
   background: #eef3ff;
 }
 
+.cell .marks {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  width: 100%;
+  height: 100%;
+  line-height: 1;
+  align-items: center;
+}
+
+.cell .mark {
+  font-size: 0.52rem;
+  color: #7a8699;
+  text-align: center;
+}
+
+.cell .mark.empty {
+  visibility: hidden;
+}
+
+.learn {
+  margin-top: 1rem;
+  border: 1px solid #9db2d6;
+  border-radius: 10px;
+  background: #fff;
+  padding: 0.75rem 1rem;
+}
+
+.learn h3 {
+  margin: 0 0 0.5rem;
+  font-size: 1rem;
+}
+
+.learn-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  max-height: 11rem;
+  overflow-y: auto;
+}
+
+.learn-item {
+  text-align: left;
+  padding: 0.35rem 0.6rem;
+  border: 1px solid #c3cfe8;
+  border-radius: 6px;
+  background: #f4f7ff;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.learn-item:hover {
+  background: #dcebfd;
+}
+
+.walkthrough-title {
+  color: #1663d9;
+}
+
+.walkthrough-text {
+  min-height: 2.6em;
+  font-size: 0.92rem;
+  margin: 0.25rem 0 0.5rem;
+}
+
+.walkthrough-progress {
+  color: #888;
+  font-size: 0.8rem;
+  margin-bottom: 0.5rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.walkthrough-controls {
+  display: flex;
+  gap: 0.5rem;
+}
+
 .cell.selected {
   outline: 3px solid #222;
   outline-offset: -3px;

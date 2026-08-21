@@ -28,6 +28,7 @@ pub fn from_puzzle(puzzle: &Puzzle) -> Game {
         bad_inputs: 0,
         won: false,
         elapsed_secs: 0,
+        teaching: super::Teaching::default(),
     }
 }
 
