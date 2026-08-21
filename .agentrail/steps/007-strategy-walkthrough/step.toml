@@ -1,8 +1,9 @@
 number = 7
 slug = "strategy-walkthrough"
-status = "pending"
+status = "completed"
 description = "Learn mode part 2 (animated walkthrough): stepping controller (Next/Back/Clos..."
 role = "production"
 context_files = []
 created_at = "2026-08-20T18:35:23"
-commits = []
+completed_at = "2026-08-21T11:00:12"
+commits = ["d4f50020d7d0923bf6467e36335127a201717f11"]
