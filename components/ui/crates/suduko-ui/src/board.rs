@@ -76,10 +76,16 @@ pub fn view_board(
     on_showme: Callback<()>,
     on_auto: Callback<bool>,
     on_delay: Callback<u32>,
+    on_notes: Callback<()>,
+    on_note_apply: Callback<()>,
+    on_note_apply_all: Callback<()>,
+    on_note_reset: Callback<()>,
     on_help: Callback<()>,
 ) -> Html {
     let highlights = highlight_set(game);
     let teaching = game.teaching.panel_open;
+    let show_marks = teaching || game.notes_mode;
+    let notes = game.notes_mode;
     html! {
         <main class="game" data-testid="game">
             <header class="game-header">
@@ -93,6 +99,12 @@ pub fn view_board(
                     <button class="menu-btn showme-btn" data-testid="showme-btn" onclick={ on_showme.reform(|_| ()) }>
                         { if game.show_me { "Stop show-me" } else { "Show me" } }
                     </button>
+                    <button
+                        class={ if notes { "menu-btn notes-btn on" } else { "menu-btn notes-btn" } }
+                        data-testid="notes-btn"
+                        onclick={ on_notes.reform(|_| ()) }>
+                        { if notes { "Notes on" } else { "Notes" } }
+                    </button>
                     <button class="menu-btn help-btn" data-testid="help-btn" onclick={ on_help.reform(|_| ()) }>
                         { "?" }
                     </button>
@@ -103,9 +115,9 @@ pub fn view_board(
                     <span class="bad" data-testid="bad-count">{ format!("bad: {}", game.bad_inputs) }</span>
                 </div>
             </header>
-            { grid(game, &highlights, &on_select, teaching) }
+            { grid(game, &highlights, &on_select, show_marks) }
             { if teaching {
-                crate::learn::learn_panel(game, &on_learn, &on_pick, &on_step, &on_auto, &on_delay)
+                crate::learn::learn_panel(game, &on_learn, &on_pick, &on_step, &on_auto, &on_delay, &on_note_apply, &on_note_apply_all, &on_note_reset)
             } else { html! {} } }
             { pad(game, &on_digit, &on_erase) }
             if game.won {
@@ -115,13 +127,13 @@ pub fn view_board(
     }
 }
 
-fn grid(game: &Game, highlights: &[usize], on_select: &Callback<usize>, teaching: bool) -> Html {
-    let marks = if teaching {
+fn grid(game: &Game, highlights: &[usize], on_select: &Callback<usize>, show_marks: bool) -> Html {
+    let marks = if show_marks {
         Some(game.pencil_marks())
     } else {
         None
     };
-    let view = if teaching { game.step_view() } else { None };
+    let view = game.step_view();
     let cells = (0..81).map(|idx| {
         cell(
             game,

@@ -15,16 +15,27 @@ pub fn start(game: &mut Game) {
     game.show_me_auto = true;
     game.show_me_delay_ticks = DEFAULT_DELAY_TICKS;
     game.show_me_wait = 0;
-    refresh_offers(game);
+    let cands = suduko_tutor::candidates_with(&game.shown_values(), &game.eliminated);
+    game.teaching.refresh(&cands);
     game.teaching.panel_open = true;
     game.teaching.select(0);
+}
+
+/// Toggles show-me mode.
+pub fn toggle(game: &mut Game) {
+    if game.show_me {
+        stop(game);
+    } else {
+        start(game);
+    }
 }
 
 /// Stops show-me mode and clears solver state (the board survives).
 pub fn stop(game: &mut Game) {
     game.show_me = false;
     game.show_me_auto = false;
-    game.eliminated.clear();
+    // The elimination layer survives: it is the user's pencil-note
+    // state too (Reset is the explicit clear).
     game.teaching.close();
 }
 
@@ -88,13 +99,6 @@ pub fn apply(game: &mut Game) {
         stop(game);
         return;
     }
-    refresh_offers(game);
-    game.teaching.select(0);
-}
-
-/// Recomputes offers; falls back to a taught trial placement when the
-/// taught techniques are exhausted.
-fn refresh_offers(game: &mut Game) {
     let cands = suduko_tutor::candidates_with(&game.shown_values(), &game.eliminated);
     game.teaching.refresh(&cands);
     if game.teaching.offers().is_empty()
@@ -103,4 +107,5 @@ fn refresh_offers(game: &mut Game) {
     {
         game.teaching.push_offer(trial);
     }
+    game.teaching.select(0);
 }

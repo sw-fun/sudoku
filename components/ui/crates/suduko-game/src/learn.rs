@@ -105,21 +105,62 @@ impl Game {
     /// Pencil marks for the current board (empty cells only).
     #[must_use]
     pub fn pencil_marks(&self) -> [Vec<u8>; CELL_COUNT] {
-        marks(&self.shown_values(), &self.eliminated)
+        let cands = suduko_tutor::candidates_with(&self.shown_values(), &self.eliminated);
+        core::array::from_fn(|idx| {
+            if !cands.placed[idx] {
+                (1..=9u8)
+                    .filter(|d| cands.masks[idx] & (1 << (d - 1)) != 0)
+                    .collect()
+            } else {
+                Vec::new()
+            }
+        })
     }
 }
 
-/// Pencil marks for a board minus an elimination layer.
-#[must_use]
-pub fn marks(shown: &[u8; CELL_COUNT], eliminated: &[(usize, u8)]) -> [Vec<u8>; CELL_COUNT] {
-    let cands = suduko_tutor::candidates_with(shown, eliminated);
-    core::array::from_fn(|idx| {
-        if !cands.placed[idx] {
-            (1..=9u8)
-                .filter(|d| cands.masks[idx] & (1 << (d - 1)) != 0)
-                .collect()
-        } else {
-            Vec::new()
+/// Pencil-note operations on the removal layer.
+pub enum NoteOp {
+    /// Append strategy removals to the layer.
+    Extend(Vec<(usize, u8)>),
+    /// Apply the selected walkthrough annotation's eliminations.
+    ApplyCurrent,
+    /// Apply every offered elimination strategy at once.
+    ApplyAll,
+    /// Clear the whole layer.
+    Reset,
+}
+
+/// One note-layer action; see `NoteOp`.
+pub fn note(game: &mut Game, op: NoteOp) {
+    match op {
+        NoteOp::Extend(removals) => {
+            game.eliminated.extend(removals);
+            game.eliminated.sort_unstable();
+            game.eliminated.dedup();
         }
-    })
+        NoteOp::ApplyCurrent => {
+            let Some(annotation) = game.teaching.current().cloned() else {
+                return;
+            };
+            if let suduko_tutor::Effect::Eliminate { removals } = annotation.effect {
+                note(game, NoteOp::Extend(removals));
+                let cands = suduko_tutor::candidates_with(&game.shown_values(), &game.eliminated);
+                game.teaching.refresh(&cands);
+                game.teaching.panel_open = true;
+            }
+        }
+        NoteOp::ApplyAll => {
+            let mut all = Vec::new();
+            for a in game.teaching.offers() {
+                if let suduko_tutor::Effect::Eliminate { removals } = &a.effect {
+                    all.extend_from_slice(removals);
+                }
+            }
+            note(game, NoteOp::Extend(all));
+            let cands = suduko_tutor::candidates_with(&game.shown_values(), &game.eliminated);
+            game.teaching.refresh(&cands);
+            game.teaching.panel_open = true;
+        }
+        NoteOp::Reset => game.eliminated.clear(),
+    }
 }

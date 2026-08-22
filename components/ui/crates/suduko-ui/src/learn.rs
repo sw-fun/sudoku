@@ -7,6 +7,7 @@ use yew::prelude::*;
 
 /// The learn panel: picker when nothing is selected, walkthrough
 /// shell once a strategy is chosen.
+#[allow(clippy::too_many_arguments)]
 pub fn learn_panel(
     game: &Game,
     on_learn: &Callback<()>,
@@ -14,18 +15,34 @@ pub fn learn_panel(
     on_step: &Callback<isize>,
     on_auto: &Callback<bool>,
     on_delay: &Callback<u32>,
+    on_apply: &Callback<()>,
+    on_apply_all: &Callback<()>,
+    on_reset: &Callback<()>,
 ) -> Html {
     match game.teaching.current() {
-        None => picker(game, on_pick),
-        Some(_) => walkthrough(game, on_learn, on_step, on_auto, on_delay),
+        None => picker(game, on_pick, on_apply_all, on_reset),
+        Some(_) => walkthrough(game, on_learn, on_step, on_auto, on_delay, on_apply),
     }
 }
 
-fn picker(game: &Game, on_pick: &Callback<usize>) -> Html {
+fn picker(
+    game: &Game,
+    on_pick: &Callback<usize>,
+    on_apply_all: &Callback<()>,
+    on_reset: &Callback<()>,
+) -> Html {
     let offers = game.teaching.offers();
     html! {
         <section class="learn" data-testid="learn-panel">
             <h3>{ format!("Strategies on this board ({})", offers.len()) }</h3>
+            <div class="picker-actions">
+                <button class="menu-btn" data-testid="apply-all" onclick={ on_apply_all.reform(|_| ()) }>
+                    { "Apply all eliminations" }
+                </button>
+                <button class="menu-btn" data-testid="reset-marks" onclick={ on_reset.reform(|_| ()) }>
+                    { "Reset marks" }
+                </button>
+            </div>
             <div class="learn-list">
                 { for offers.iter().enumerate().map(|(idx, a)| html! {
                     <button
@@ -46,6 +63,7 @@ fn walkthrough(
     on_step: &Callback<isize>,
     on_auto: &Callback<bool>,
     on_delay: &Callback<u32>,
+    on_apply: &Callback<()>,
 ) -> Html {
     let Some(annotation) = game.teaching.current() else {
         return html! {};
@@ -55,6 +73,7 @@ fn walkthrough(
     };
     let index = game.teaching.step_index;
     let last = annotation.steps.len() - 1;
+    let has_eliminations = matches!(annotation.effect, suduko_tutor::Effect::Eliminate { .. });
     html! {
         <section class="learn walkthrough" data-testid="walkthrough">
             <h3 class="walkthrough-title">{ annotation.title.clone() }</h3>
@@ -63,6 +82,17 @@ fn walkthrough(
             </div>
             <div class="walkthrough-progress">{ format!("step {} of {}", index + 1, last + 1) }</div>
             { walkthrough_controls(game, index, last, on_learn, on_step, on_auto, on_delay) }
+            {
+                if has_eliminations && index == last {
+                    html! {
+                        <button class="menu-btn apply-btn" data-testid="apply-strategy" onclick={ on_apply.reform(|_| ()) }>
+                            { "Apply these removals" }
+                        </button>
+                    }
+                } else {
+                    html! {}
+                }
+            }
         </section>
     }
 }

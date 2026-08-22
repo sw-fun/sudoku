@@ -7,7 +7,7 @@ use crate::menu::{next_seed, start_game, view_menu};
 use gloo_timers::callback::Interval;
 use std::collections::BTreeMap;
 use suduko_engine::Level;
-use suduko_game::{Game, clear_selected, entry};
+use suduko_game::{Game, NoteOp, clear_selected, entry, note};
 use yew::prelude::*;
 
 pub(crate) enum Msg {
@@ -24,6 +24,10 @@ pub(crate) enum Msg {
     ShowMeToggle,
     ShowMeAuto(bool),
     ShowMeDelay(u32),
+    NotesToggle,
+    NoteApply,
+    NoteApplyAll,
+    NoteReset,
     HelpToggle,
     /// Escape/space: closes help when open, otherwise the classic role.
     ContextKey(crate::keys::Key),
@@ -95,15 +99,13 @@ impl Component for Model {
             Msg::LearnToggle => self.mut_game(Game::toggle_learn),
             Msg::LearnSelect(idx) => self.mut_game(|g| g.teaching.select(idx)),
             Msg::LearnStep(d) => self.mut_game(|g| suduko_game::showme::step_or_apply(g, d)),
-            Msg::ShowMeToggle => self.mut_game(|g| {
-                if g.show_me {
-                    suduko_game::showme::stop(g);
-                } else {
-                    suduko_game::showme::start(g);
-                }
-            }),
+            Msg::ShowMeToggle => self.mut_game(suduko_game::showme::toggle),
             Msg::ShowMeAuto(on) => self.mut_game(|g| g.show_me_auto = on),
             Msg::ShowMeDelay(ticks) => self.mut_game(|g| g.show_me_delay_ticks = ticks),
+            Msg::NotesToggle => self.mut_game(|g| g.notes_mode = !g.notes_mode),
+            Msg::NoteApply => self.mut_game(|g| note(g, NoteOp::ApplyCurrent)),
+            Msg::NoteApplyAll => self.mut_game(|g| note(g, NoteOp::ApplyAll)),
+            Msg::NoteReset => self.mut_game(|g| note(g, NoteOp::Reset)),
             Msg::HelpToggle => {
                 self.help_open = !self.help_open;
                 true
@@ -131,6 +133,10 @@ impl Component for Model {
                         ctx.link().callback(|_| Msg::ShowMeToggle),
                         ctx.link().callback(Msg::ShowMeAuto),
                         ctx.link().callback(Msg::ShowMeDelay),
+                        ctx.link().callback(|_| Msg::NotesToggle),
+                        ctx.link().callback(|_| Msg::NoteApply),
+                        ctx.link().callback(|_| Msg::NoteApplyAll),
+                        ctx.link().callback(|_| Msg::NoteReset),
                         ctx.link().callback(|_| Msg::HelpToggle),
                     );
                     if self.help_open {

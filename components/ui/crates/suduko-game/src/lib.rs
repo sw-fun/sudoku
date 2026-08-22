@@ -13,7 +13,7 @@ mod trial;
 
 pub use build::from_strings;
 pub use input::{Outcome, clear_selected, entry, erase, highlight_set, set_value};
-pub use learn::{Pulse, StepView};
+pub use learn::{NoteOp, Pulse, StepView, note};
 pub use teaching::Teaching;
 
 use suduko_grid::CELL_COUNT;
@@ -52,6 +52,9 @@ pub struct Game {
     pub show_me_wait: u32,
     /// Solver eliminations: candidates removed but not yet placed.
     pub eliminated: Vec<(usize, u8)>,
+    /// Notes mode: digit entry toggles pencil marks instead of
+    /// placing values.
+    pub notes_mode: bool,
 }
 
 impl Game {

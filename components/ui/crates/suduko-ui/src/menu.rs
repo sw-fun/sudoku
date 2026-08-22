@@ -94,6 +94,13 @@ pub fn help_overlay(on_close: Callback<()>) -> Html {
                     <li>{ "Wrong entries turn red and count in the bad counter." }</li>
                     <li>{ "A pad digit grays out once all nine of it are placed correctly." }</li>
                 </ul>
+                <h2>{ "Pencil marks" }</h2>
+                <ul>
+                    <li>{ "Notes shows candidate marks in every empty cell while you play." }</li>
+                    <li>{ "With Notes on, typing (or tapping) a digit toggles that candidate in the selected cell; Erase restores the cell's computed candidates." }</li>
+                    <li>{ "In Learn, Apply these removals applies one strategy's eliminations to your marks; the picker's Apply all does every listed elimination at once (placements stay yours to make)." }</li>
+                    <li>{ "Reset marks clears all removals and returns to computed candidates." }</li>
+                </ul>
                 <h2>{ "Learn mode" }</h2>
                 <ul>
                     <li>{ "Learn lists every strategy available on the current board - singles, pointing/claiming, pairs, X-Wing, XY-Wing." }</li>

@@ -359,6 +359,21 @@ body {
   font-variant-numeric: tabular-nums;
 }
 
+.picker-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.apply-btn {
+  margin-top: 0.5rem;
+}
+
+.notes-btn.on {
+  background: #dcebfd;
+  border-color: #1663d9;
+}
+
 .walkthrough-controls {
   display: flex;
   gap: 0.5rem;

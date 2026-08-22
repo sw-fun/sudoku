@@ -40,17 +40,50 @@ pub fn erase(game: &mut Game, idx: usize) {
     }
 }
 
-/// Enters `digit` into the selected cell, if one is selected.
+/// Enters `digit` into the selected cell, if one is selected. In
+/// notes mode the digit toggles a pencil-mark candidate instead of
+/// placing (empty cells only; computed candidates are never restored
+/// beyond what the rules allow).
 pub fn entry(game: &mut Game, digit: u8) {
-    if let Some(&sel) = game.selected.as_ref() {
-        set_value(game, sel, digit);
+    let Some(&sel) = game.selected.as_ref() else {
+        return;
+    };
+    if game.notes_mode {
+        toggle_mark(game, sel, digit);
+        return;
     }
+    set_value(game, sel, digit);
 }
 
-/// Erases the selected cell, if one is selected.
+/// Erases the selected cell, if one is selected. In notes mode it
+/// restores the selected cell's computed candidates instead.
 pub fn clear_selected(game: &mut Game) {
-    if let Some(&sel) = game.selected.as_ref() {
-        erase(game, sel);
+    let Some(&sel) = game.selected.as_ref() else {
+        return;
+    };
+    if game.notes_mode {
+        game.eliminated.retain(|&(i, _)| i != sel);
+        return;
+    }
+    erase(game, sel);
+}
+
+/// Toggles one user candidate mark in the selected empty cell:
+/// removals join the elimination layer, repeat-typing removes the
+/// removal (marks that the rules exclude are ignored).
+fn toggle_mark(game: &mut Game, idx: usize, digit: u8) {
+    if game.shown(idx) != 0 {
+        return;
+    }
+    let base = suduko_tutor::candidates_with(&game.shown_values(), &[]);
+    if base.masks[idx] & (1 << (digit - 1)) == 0 {
+        return;
+    }
+    let entry = (idx, digit);
+    if game.eliminated.contains(&entry) {
+        game.eliminated.retain(|&e| e != entry);
+    } else {
+        game.eliminated.push(entry);
     }
 }
 
