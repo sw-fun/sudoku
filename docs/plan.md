@@ -171,7 +171,10 @@ puzzle is never singles-solvable (a hard board is never too easy).
   the menu button is always available.
 - Game header on narrow screens sits below the fixed github corner,
   buttons (Menu/Learn/Show me) on the first line and level/timer/bad
-  count on the second.
+  count on the second. A Help (?) button opens a modal over the game
+  in progress: the board and timer keep running underneath, and
+  Escape, the backdrop, or the close button returns to the untouched
+  board (Escape closes help before it navigates).
 - Cookie persistence: versioned, compact state document; loaded on mount;
   written on every state change; tolerant of missing/corrupt cookies.
 - Serving: `trunk build` produces static WASM assets served by a Rust file

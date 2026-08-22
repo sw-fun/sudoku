@@ -76,6 +76,7 @@ pub fn view_board(
     on_showme: Callback<()>,
     on_auto: Callback<bool>,
     on_delay: Callback<u32>,
+    on_help: Callback<()>,
 ) -> Html {
     let highlights = highlight_set(game);
     let teaching = game.teaching.panel_open;
@@ -91,6 +92,9 @@ pub fn view_board(
                     </button>
                     <button class="menu-btn showme-btn" data-testid="showme-btn" onclick={ on_showme.reform(|_| ()) }>
                         { if game.show_me { "Stop show-me" } else { "Show me" } }
+                    </button>
+                    <button class="menu-btn help-btn" data-testid="help-btn" onclick={ on_help.reform(|_| ()) }>
+                        { "?" }
                     </button>
                 </div>
                 <div class="header-stats">

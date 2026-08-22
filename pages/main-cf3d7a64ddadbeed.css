@@ -110,6 +110,37 @@ body {
   margin-left: auto;
 }
 
+.help-card {
+  max-width: 26rem;
+  max-height: min(80vh, 40rem);
+  overflow-y: auto;
+  text-align: left;
+  font-size: 0.9rem;
+  line-height: 1.35;
+}
+
+.help-card h2 {
+  font-size: 1.05rem;
+  margin: 0.8rem 0 0.35rem;
+}
+
+.help-card h2:first-child {
+  margin-top: 0;
+}
+
+.help-card ul {
+  margin: 0;
+  padding-left: 1.1rem;
+}
+
+.help-card li {
+  margin: 0.2rem 0;
+}
+
+.help-card .level-btn {
+  margin-top: 0.9rem;
+}
+
 .board-wrap {
   display: grid;
   grid-template-columns: var(--coord) auto;

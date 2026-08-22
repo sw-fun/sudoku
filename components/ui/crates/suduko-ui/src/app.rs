@@ -24,6 +24,9 @@ pub(crate) enum Msg {
     ShowMeToggle,
     ShowMeAuto(bool),
     ShowMeDelay(u32),
+    HelpToggle,
+    /// Escape/space: closes help when open, otherwise the classic role.
+    ContextKey(crate::keys::Key),
 }
 
 pub(crate) struct Model {
@@ -32,6 +35,7 @@ pub(crate) struct Model {
     level: Level,
     stats: BTreeMap<Level, u32>,
     seed: u64,
+    help_open: bool,
     _timer: Interval,
 }
 
@@ -53,6 +57,7 @@ impl Component for Model {
             level: Level::Easy,
             stats: BTreeMap::new(),
             seed: next_seed(),
+            help_open: false,
             _timer: timer,
         }
     }
@@ -89,9 +94,7 @@ impl Component for Model {
             }
             Msg::LearnToggle => self.mut_game(Game::toggle_learn),
             Msg::LearnSelect(idx) => self.mut_game(|g| g.teaching.select(idx)),
-            Msg::LearnStep(delta) => {
-                self.mut_game(|g| suduko_game::showme::step_or_apply(g, delta))
-            }
+            Msg::LearnStep(d) => self.mut_game(|g| suduko_game::showme::step_or_apply(g, d)),
             Msg::ShowMeToggle => self.mut_game(|g| {
                 if g.show_me {
                     suduko_game::showme::stop(g);
@@ -101,6 +104,11 @@ impl Component for Model {
             }),
             Msg::ShowMeAuto(on) => self.mut_game(|g| g.show_me_auto = on),
             Msg::ShowMeDelay(ticks) => self.mut_game(|g| g.show_me_delay_ticks = ticks),
+            Msg::HelpToggle => {
+                self.help_open = !self.help_open;
+                true
+            }
+            Msg::ContextKey(key) => self.context_key(key),
         }
     }
 
@@ -108,21 +116,36 @@ impl Component for Model {
         match &self.screen {
             Screen::Menu => view_menu(ctx.link(), &self.stats),
             Screen::Game => match &self.game {
-                Some(game) => view_board(
-                    game,
-                    self.level,
-                    ctx.link().callback(Msg::Select),
-                    ctx.link().callback(Msg::Digit),
-                    ctx.link().callback(|_| Msg::Erase),
-                    ctx.link().callback(|_| Msg::Menu),
-                    ctx.link().callback(|_| Msg::NextBoard),
-                    ctx.link().callback(|_| Msg::LearnToggle),
-                    ctx.link().callback(Msg::LearnSelect),
-                    ctx.link().callback(|d: isize| Msg::LearnStep(d)),
-                    ctx.link().callback(|_| Msg::ShowMeToggle),
-                    ctx.link().callback(Msg::ShowMeAuto),
-                    ctx.link().callback(Msg::ShowMeDelay),
-                ),
+                Some(game) => {
+                    let board = view_board(
+                        game,
+                        self.level,
+                        ctx.link().callback(Msg::Select),
+                        ctx.link().callback(Msg::Digit),
+                        ctx.link().callback(|_| Msg::Erase),
+                        ctx.link().callback(|_| Msg::Menu),
+                        ctx.link().callback(|_| Msg::NextBoard),
+                        ctx.link().callback(|_| Msg::LearnToggle),
+                        ctx.link().callback(Msg::LearnSelect),
+                        ctx.link().callback(|d: isize| Msg::LearnStep(d)),
+                        ctx.link().callback(|_| Msg::ShowMeToggle),
+                        ctx.link().callback(Msg::ShowMeAuto),
+                        ctx.link().callback(Msg::ShowMeDelay),
+                        ctx.link().callback(|_| Msg::HelpToggle),
+                    );
+                    if self.help_open {
+                        html! {
+                            <>
+                                { board }
+                                { crate::menu::help_overlay(
+                                    ctx.link().callback(|_| Msg::HelpToggle),
+                                ) }
+                            </>
+                        }
+                    } else {
+                        board
+                    }
+                }
                 None => view_menu(ctx.link(), &self.stats),
             },
         }
@@ -130,16 +153,27 @@ impl Component for Model {
 
     fn rendered(&mut self, ctx: &Context<Self>, first: bool) {
         if first {
-            install_key_handler(ctx.link().callback(|k| match k {
-                crate::keys::Key::Digit(d) => Msg::Digit(d),
-                crate::keys::Key::Space => Msg::Erase,
-                crate::keys::Key::Escape => Msg::Menu,
-            }));
+            install_key_handler(ctx.link().callback(Msg::ContextKey));
         }
     }
 }
 
 impl Model {
+    /// Context keys: any key closes help; otherwise Escape opens the
+    /// menu, space erases, digits place.
+    fn context_key(&mut self, key: crate::keys::Key) -> bool {
+        if self.help_open {
+            self.help_open = false;
+            return true;
+        }
+        match key {
+            crate::keys::Key::Escape => self.screen = Screen::Menu,
+            crate::keys::Key::Space => return self.mut_game(clear_selected),
+            crate::keys::Key::Digit(d) => return self.mut_game(|g| entry(g, d)),
+        }
+        true
+    }
+
     fn mut_game(&mut self, f: impl FnOnce(&mut Game)) -> bool {
         match self.game.as_mut() {
             Some(g) => {

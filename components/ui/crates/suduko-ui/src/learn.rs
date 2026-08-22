@@ -1,4 +1,5 @@
 //! Learn-mode UI: the strategy picker, the walkthrough shell, and
+//! the per-step cell emphasis rendering. the strategy picker, the walkthrough shell, and
 //! the per-step cell emphasis rendering.
 
 use suduko_game::{Game, StepView};
