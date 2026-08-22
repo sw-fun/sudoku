@@ -1,6 +1,6 @@
 mod app;
 mod board;
-mod keys;
+pub mod keys;
 mod learn;
 mod menu;
 

@@ -1,6 +1,8 @@
 # Suduko
 
-Browser-based Sudoku built with Rust, Yew, and WASM.
+Browser-based Sudoku built with Rust, Yew, and WASM. Play with the
+on-screen pad or the keyboard: type 1-9 to place, and erase with
+spacebar, Backspace, or Delete.
 
 **Play the live demo:** https://sw-fun.github.io/sudoku/ (built locally by
 `scripts/build-pages.sh` and pushed with `pages/`; no CI build).

@@ -4,15 +4,20 @@
 use wasm_bindgen::prelude::*;
 use yew::Callback;
 
-pub(crate) enum Key {
+pub enum Key {
     Digit(u8),
     Space,
     Escape,
 }
 
-pub(crate) fn parse_key(code: &str, key: &str) -> Option<Key> {
+/// Pure key decoder behind the browser handler.
+pub fn parse_key(code: &str, key: &str) -> Option<Key> {
     match code {
-        "Space" => Some(Key::Space),
+        // Space, Backspace, and Delete all erase: space keeps the
+        // original one-hand shortcut; Backspace/Delete match the
+        // universal remove-what-I-typed reflex (Mac Backspace, Mac
+        // fn+Backspace/ForwardDelete, PC Backspace and Delete).
+        "Space" | "Backspace" | "Delete" | "ForwardDelete" => Some(Key::Space),
         "Escape" => Some(Key::Escape),
         _ => {
             let bytes = key.as_bytes();

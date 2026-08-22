@@ -157,7 +157,10 @@ puzzle is never singles-solvable (a hard board is never too easy).
     incorrect user guesses.
 - Wrong-value detection compares user value against the stored solution;
   wrong cells render red and increment the bad-inputs counter on entry.
-- Input: keyboard 1..9 and spacebar via keydown; button pad 1..9 plus erase.
+- Input: keyboard 1..9 via keydown; the selected cell erases on
+  spacebar, Backspace, or Delete (Mac fn+Backspace included) so
+  keyboard play never needs the Erase button; button pad 1..9 plus
+  erase remains for touch.
   A pad button grays out and disables once all nine instances of its digit
   are placed correctly (wrong placements never count; erasing reopens it).
 - Win detection: no empty cells and no wrong values -> flash animation,
