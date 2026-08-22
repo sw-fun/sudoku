@@ -1,0 +1,1 @@
+Backspace/Delete (incl. Mac forward-delete) now erase the selected cell alongside spacebar: parse_key extended (pure, TDD via new tests/keys.rs), verified with real key presses in playwright, docs/README updated, pages rebuilt, just check + wasm green.
