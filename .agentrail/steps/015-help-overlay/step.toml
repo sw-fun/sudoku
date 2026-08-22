@@ -1,8 +1,9 @@
 number = 15
 slug = "help-overlay"
-status = "in-progress"
+status = "completed"
 description = "Help overlay from user feedback: a Help (?) button in the game header opens a..."
 role = "production"
 context_files = []
 created_at = "2026-08-22T14:50:03"
-commits = []
+completed_at = "2026-08-22T14:55:06"
+commits = ["02f6bd7fa3f2a49c3b114c8da137110c14fd70f8"]
