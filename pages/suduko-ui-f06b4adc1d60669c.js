@@ -359,7 +359,7 @@ function __wbg_get_imports() {
         },
         __wbindgen_cast_0000000000000002: function(arg0, arg1) {
             // Cast intrinsic for `Closure(Closure { owned: true, function: Function { arguments: [NamedExternref("KeyboardEvent")], shim_idx: 59, ret: Unit, inner_ret: Some(Unit) }, mutable: false }) -> Externref`.
-            const ret = makeClosure(arg0, arg1, wasm_bindgen__convert__closures_____invoke__h2466e63b164a81a2);
+            const ret = makeClosure(arg0, arg1, wasm_bindgen__convert__closures_____invoke__h53120ebdd7ed220e);
             return ret;
         },
         __wbindgen_cast_0000000000000003: function(arg0, arg1) {
@@ -397,8 +397,8 @@ function wasm_bindgen__convert__closures_____invoke__h44e38be41ea051f1(arg0, arg
     wasm.wasm_bindgen__convert__closures_____invoke__h44e38be41ea051f1(arg0, arg1);
 }
 
-function wasm_bindgen__convert__closures_____invoke__h2466e63b164a81a2(arg0, arg1, arg2) {
-    wasm.wasm_bindgen__convert__closures_____invoke__h2466e63b164a81a2(arg0, arg1, arg2);
+function wasm_bindgen__convert__closures_____invoke__h53120ebdd7ed220e(arg0, arg1, arg2) {
+    wasm.wasm_bindgen__convert__closures_____invoke__h53120ebdd7ed220e(arg0, arg1, arg2);
 }
 
 function wasm_bindgen__convert__closures________invoke__hc3f9a5f79a2ee71b(arg0, arg1, arg2) {

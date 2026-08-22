@@ -4,18 +4,18 @@ version = 4
 
 [[package]]
 name = "suduko-grid"
-version = "0.2.0"
+version = "0.3.0"
 
 [[package]]
 name = "suduko-techniques"
-version = "0.2.0"
+version = "0.3.0"
 dependencies = [
  "suduko-grid",
 ]
 
 [[package]]
 name = "suduko-tutor"
-version = "0.2.0"
+version = "0.3.0"
 dependencies = [
  "suduko-grid",
  "suduko-techniques",
