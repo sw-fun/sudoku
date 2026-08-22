@@ -1,8 +1,9 @@
 number = 16
 slug = "pencil-notes"
-status = "in-progress"
+status = "completed"
 description = "Pencil-mark notes from user feedback (2 users): (1) Notes toggle - marks visi..."
 role = "production"
 context_files = []
 created_at = "2026-08-22T14:59:30"
-commits = []
+completed_at = "2026-08-22T15:11:45"
+commits = ["9be739373e2da769440edf45bbcf8aa24e6c2807"]
