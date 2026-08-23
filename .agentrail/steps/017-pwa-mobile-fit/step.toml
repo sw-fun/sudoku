@@ -1,0 +1,8 @@
+number = 17
+slug = "pwa-mobile-fit"
+status = "in-progress"
+description = "PWA + mobile fit from user feedback (2 users report scrolling on phones): mak..."
+role = "production"
+context_files = []
+created_at = "2026-08-23T14:28:55"
+commits = []

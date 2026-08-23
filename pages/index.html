@@ -9,15 +9,20 @@
     <meta name="apple-mobile-web-app-title" content="Sudoku" />
     <meta name="description" content="A clean, responsive Sudoku puzzle game" />
     <link rel="icon" href="favicon.ico" />
-    <link rel="manifest" href="/manifest.json" />
+    <link rel="manifest" href="manifest.json" />
     <link rel="apple-touch-icon" href="icon-192.png" />
     <title>Sudoku</title>
     
-    <link rel="stylesheet" href="/sudoku/main-737ad3a229814d56.css" integrity="sha384-enCJBCN80EG/643OZIvvEjFT7CvoknVrzaM5Q1rfqNHc71kFxDhcz/m6qSSglDG8"/>
+    
+    
+    
+    
+    
+    <link rel="stylesheet" href="/sudoku/main-8f8f07580f0c87ab.css" integrity="sha384-O8nDDf7P7yiHQSyUS4E1+tAiVXUUF6I/1yjVjBc7QzAy3kGjl+nFNfAaaSIAER4r"/>
     
 <script type="module">
-import init, * as bindings from '/sudoku/suduko-ui-f06b4adc1d60669c.js';
-const wasm = await init({ module_or_path: '/sudoku/suduko-ui-f06b4adc1d60669c_bg.wasm' });
+import init, * as bindings from '/sudoku/suduko-ui-43a28e3fec9a04b6.js';
+const wasm = await init({ module_or_path: '/sudoku/suduko-ui-43a28e3fec9a04b6_bg.wasm' });
 
 
 window.wasmBindings = bindings;
@@ -26,7 +31,7 @@ window.wasmBindings = bindings;
 dispatchEvent(new CustomEvent("TrunkApplicationStarted", {detail: {wasm}}));
 
 </script>
-  <link rel="modulepreload" href="/sudoku/suduko-ui-f06b4adc1d60669c.js" crossorigin="anonymous" integrity="sha384-JSjs+1vFUyh0P8OgEUGOXx9Ixn5ei7rDS8nK7bJSl8CwB670nXdAfD4rZ6keH4b/"><link rel="preload" href="/sudoku/suduko-ui-f06b4adc1d60669c_bg.wasm" crossorigin="anonymous" integrity="sha384-A8DDkaQE5mJmVlEk3PRq0vMfHmb7RdWt8wE3fvCbojQw1h9YiJH4V63TDQwzEe+u" as="fetch" type="application/wasm"></head>
+  <link rel="modulepreload" href="/sudoku/suduko-ui-43a28e3fec9a04b6.js" crossorigin="anonymous" integrity="sha384-dwMDdTRNK9Bfx0oxw2gqxK3st/LxG8cAhdcbqxGOC0+DeCzYO4wR3pE26GGMkNlR"><link rel="preload" href="/sudoku/suduko-ui-43a28e3fec9a04b6_bg.wasm" crossorigin="anonymous" integrity="sha384-0z8kQXL6ywOLA6e5AopZxr/LZiew3a7QiEy3L3dqxDNGB0fdLH3dm7kUqkneyv1g" as="fetch" type="application/wasm"></head>
   <body>
     <div id="app"></div>
     <a
@@ -51,5 +56,12 @@ dispatchEvent(new CustomEvent("TrunkApplicationStarted", {detail: {wasm}}));
       <span><a href="https://github.com/orgs/sw-fun/repositories" target="_blank" rel="noopener">sw-fun</a></span>
       <span id="build-info"></span>
     </footer>
+    <script>
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('sw.js').catch(err => {
+          console.log('Service Worker registration failed:', err);
+        });
+      }
+    </script>
   </body>
 </html>

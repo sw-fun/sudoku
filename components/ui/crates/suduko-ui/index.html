@@ -9,12 +9,15 @@
     <meta name="apple-mobile-web-app-title" content="Sudoku" />
     <meta name="description" content="A clean, responsive Sudoku puzzle game" />
     <link rel="icon" href="favicon.ico" />
-    <link rel="manifest" href="/manifest.json" />
+    <link rel="manifest" href="manifest.json" />
     <link rel="apple-touch-icon" href="icon-192.png" />
     <title>Sudoku</title>
     <link data-trunk rel="copy-file" href="favicon.ico" />
     <link data-trunk rel="copy-file" href="manifest.json" />
     <link data-trunk rel="copy-file" href="sw.js" />
+    <link data-trunk rel="copy-file" href="icon-192.png" />
+    <link data-trunk rel="copy-file" href="icon-512.png" />
+    <link data-trunk rel="copy-file" href="icon-512-maskable.png" />
     <link data-trunk rel="sass" href="src/main.scss" />
     <link data-trunk rel="rust" data-bin="suduko-ui" />
   </head>
@@ -44,7 +47,7 @@
     </footer>
     <script>
       if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('/sw.js').catch(err => {
+        navigator.serviceWorker.register('sw.js').catch(err => {
           console.log('Service Worker registration failed:', err);
         });
       }
