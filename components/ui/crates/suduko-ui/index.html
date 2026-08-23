@@ -2,10 +2,19 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+    <meta name="theme-color" content="#1663d9" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Sudoku" />
+    <meta name="description" content="A clean, responsive Sudoku puzzle game" />
     <link rel="icon" href="favicon.ico" />
-    <title>Suduko</title>
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="apple-touch-icon" href="icon-192.png" />
+    <title>Sudoku</title>
     <link data-trunk rel="copy-file" href="favicon.ico" />
+    <link data-trunk rel="copy-file" href="manifest.json" />
+    <link data-trunk rel="copy-file" href="sw.js" />
     <link data-trunk rel="sass" href="src/main.scss" />
     <link data-trunk rel="rust" data-bin="suduko-ui" />
   </head>
@@ -33,5 +42,12 @@
       <span><a href="https://github.com/orgs/sw-fun/repositories" target="_blank" rel="noopener">sw-fun</a></span>
       <span id="build-info"></span>
     </footer>
+    <script>
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/sw.js').catch(err => {
+          console.log('Service Worker registration failed:', err);
+        });
+      }
+    </script>
   </body>
 </html>

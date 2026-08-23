@@ -147,14 +147,14 @@ fn grid(game: &Game, highlights: &[usize], on_select: &Callback<usize>, show_mar
     html! {
         <div class="board-wrap" data-testid="board-wrap">
             <span class="coord corner" aria-hidden="true"></span>
-            <div class="col-labels" data-testid="col-labels">
-                { for (1..=9).map(|n| html! { <span class="coord">{ n }</span> }) }
-            </div>
             <div class="row-labels" data-testid="row-labels">
                 { for (1..=9).map(|n| html! { <span class="coord">{ n }</span> }) }
             </div>
             <div class="board" data-testid="board">
                 { for cells }
+            </div>
+            <div class="col-labels" data-testid="col-labels">
+                { for (1..=9).map(|n| html! { <span class="coord">{ n }</span> }) }
             </div>
         </div>
     }
