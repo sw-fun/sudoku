@@ -1,8 +1,9 @@
 number = 17
 slug = "pwa-mobile-fit"
-status = "in-progress"
+status = "completed"
 description = "PWA + mobile fit from user feedback (2 users report scrolling on phones): mak..."
 role = "production"
 context_files = []
 created_at = "2026-08-23T14:28:55"
-commits = []
+completed_at = "2026-08-23T14:29:31"
+commits = ["70bfb5a0eb0b07b65dce9ac4049d35d129490c65"]
