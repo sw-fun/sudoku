@@ -6,23 +6,23 @@
     <meta name="theme-color" content="#1663d9" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-    <meta name="apple-mobile-web-app-title" content="Sudoku" />
-    <meta name="description" content="A clean, responsive Sudoku puzzle game" />
+    <meta name="apple-mobile-web-app-title" content="Learn Sudoku" />
+    <meta name="description" content="Learn and practice Sudoku with guided strategy walkthroughs" />
     <link rel="icon" href="favicon.ico" />
     <link rel="manifest" href="manifest.json" />
     <link rel="apple-touch-icon" href="icon-192.png" />
-    <title>Sudoku</title>
+    <title>Learn/Practice Sudoku</title>
     
     
     
     
     
     
-    <link rel="stylesheet" href="/sudoku/main-3b85d959fe8ce19b.css" integrity="sha384-EAD94xlStCmn2ZBmmg+XRLdENILWyoqx0UbyEs8zozgYyEOiwY/aJTFiguNW7gDL"/>
+    <link rel="stylesheet" href="/sudoku/main-5b882f1307a2ab76.css" integrity="sha384-kdvlijzXDLj9xC/xHvhNSy5whyvBF7knR1bYYlPK8RwzLrWwo9hVj/kAH1Tqj78Q"/>
     
 <script type="module">
-import init, * as bindings from '/sudoku/suduko-ui-c9fb7f7b8451e60d.js';
-const wasm = await init({ module_or_path: '/sudoku/suduko-ui-c9fb7f7b8451e60d_bg.wasm' });
+import init, * as bindings from '/sudoku/suduko-ui-d762a216672eb5d7.js';
+const wasm = await init({ module_or_path: '/sudoku/suduko-ui-d762a216672eb5d7_bg.wasm' });
 
 
 window.wasmBindings = bindings;
@@ -31,7 +31,7 @@ window.wasmBindings = bindings;
 dispatchEvent(new CustomEvent("TrunkApplicationStarted", {detail: {wasm}}));
 
 </script>
-  <link rel="modulepreload" href="/sudoku/suduko-ui-c9fb7f7b8451e60d.js" crossorigin="anonymous" integrity="sha384-R7quQVAcPH06h+yPY4roQ8WLEVzWw0BSI/8rq9sP0M2MnA6pYpcvpXv4ssCIQ4El"><link rel="preload" href="/sudoku/suduko-ui-c9fb7f7b8451e60d_bg.wasm" crossorigin="anonymous" integrity="sha384-L9bnsHfFgrmTPXltuqGp/6Oz12uMbkFQUbw0QwkQD2Ia4PJEKMKIFwPbfah1VcOx" as="fetch" type="application/wasm"></head>
+  <link rel="modulepreload" href="/sudoku/suduko-ui-d762a216672eb5d7.js" crossorigin="anonymous" integrity="sha384-8dTQR6Z0Q/iAfXuPeay3DczYc7/dKVmfLekdjeFAUSl14z91QbwGh+sAQAMXnaAL"><link rel="preload" href="/sudoku/suduko-ui-d762a216672eb5d7_bg.wasm" crossorigin="anonymous" integrity="sha384-nlAzq494UeVmiJnyMoMBIxagVtolDzyzCq3n8SblMbLj0+oExtit9+z2rK0hHHDB" as="fetch" type="application/wasm"></head>
   <body>
     <div id="app"></div>
     <a

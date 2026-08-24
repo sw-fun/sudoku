@@ -264,28 +264,53 @@ body {
   cursor: default;
 }
 
-/* Collapsible input-mode chooser rendered near the bottom. */
-.customize {
-  margin-top: 0.6rem;
+/* Customize / abandon dialogs (overlay-card based, with close X). */
+.custom-card {
+  position: relative;
+  min-width: 16rem;
+  max-width: 22rem;
+  padding: 1.2rem 1.4rem;
   text-align: center;
 }
 
-.customize summary {
-  display: inline-block;
-  font-size: 0.85rem;
+.custom-card h2 {
+  margin: 0 0 0.4rem;
+  font-size: 1.1rem;
+}
+
+.dialog-hint {
   color: #555;
-  border: 1px solid #bbb;
-  border-radius: 6px;
-  background: #fff;
-  padding: 0.2rem 0.6rem;
+  font-size: 0.9rem;
+  margin: 0 0 0.8rem;
+}
+
+.close-x {
+  position: absolute;
+  top: 0.35rem;
+  right: 0.45rem;
+  border: none;
+  background: none;
+  font-size: 1rem;
+  color: #888;
   cursor: pointer;
+  padding: 0.15rem 0.4rem;
+}
+
+.close-x:hover {
+  color: #222;
 }
 
 .customize-row {
   display: flex;
   justify-content: center;
+  flex-wrap: wrap;
   gap: 0.4rem;
-  padding: 0.4rem 0 0.1rem;
+  padding: 0.2rem 0 0.8rem;
+}
+
+.customize-trigger {
+  margin-top: 0.6rem;
+  text-align: center;
 }
 
 .mode-btn {
@@ -300,6 +325,18 @@ body {
 .mode-btn.on {
   background: #dcebfd;
   border-color: #1663d9;
+}
+
+.level-btn.danger {
+  border-color: #d9a16a;
+  background: #fff4e8;
+}
+
+.level-btn.resume {
+  margin: 0.6rem auto 0;
+  max-width: 16rem;
+  background: #e7f3ec;
+  border-color: #7dbb8f;
 }
 
 .cell {

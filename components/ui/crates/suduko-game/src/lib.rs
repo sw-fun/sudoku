@@ -11,7 +11,7 @@ mod learn;
 mod teaching;
 mod trial;
 
-pub use build::from_strings;
+pub use build::{Save, from_strings, restore, save};
 pub use input::{Outcome, clear_selected, entry, erase, highlight_set, keypad_visible, set_value};
 pub use learn::{NoteOp, Pulse, StepView, note};
 pub use teaching::Teaching;

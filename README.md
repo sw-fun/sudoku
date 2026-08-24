@@ -1,4 +1,4 @@
-# Suduko
+# Learn/Practice Sudoku
 
 Browser-based Sudoku built with Rust, Yew, and WASM. Play with the
 on-screen pad or the keyboard: type 1-9 to place, and erase with

@@ -2,10 +2,12 @@
 //! below the board, or the per-cell popup keypad), the customize bar,
 //! the win overlay, and the learn (teaching) panel.
 
+use crate::app::{Model, Msg};
 use crate::learn::{marks_html, step_classes};
 use suduko_engine::Level;
 use suduko_game::{Game, StepView, digit_complete, highlight_set, keypad_visible};
 use suduko_uikit::{CellInput, InputMode, anchor_style, mmss};
+use yew::html::Scope;
 use yew::prelude::*;
 
 fn cell(
@@ -54,28 +56,7 @@ fn cell(
 }
 
 #[allow(clippy::too_many_arguments)]
-pub fn view_board(
-    game: &Game,
-    level: Level,
-    mode: InputMode,
-    on_select: Callback<usize>,
-    on_digit: Callback<u8>,
-    on_erase: Callback<()>,
-    on_mode: Callback<InputMode>,
-    on_menu: Callback<()>,
-    on_next: Callback<()>,
-    on_learn: Callback<()>,
-    on_pick: Callback<usize>,
-    on_step: Callback<isize>,
-    on_showme: Callback<()>,
-    on_auto: Callback<bool>,
-    on_delay: Callback<u32>,
-    on_notes: Callback<()>,
-    on_note_apply: Callback<()>,
-    on_note_apply_all: Callback<()>,
-    on_note_reset: Callback<()>,
-    on_help: Callback<()>,
-) -> Html {
+pub fn view_board(game: &Game, level: Level, mode: InputMode, link: &Scope<Model>) -> Html {
     let highlights = highlight_set(game);
     let teaching = game.teaching.panel_open;
     let show_marks = teaching || game.notes_mode;
@@ -84,22 +65,22 @@ pub fn view_board(
         <main class="game" data-testid="game">
             <header class="game-header">
                 <div class="header-btns">
-                    <button class="menu-btn" data-testid="menu-btn" onclick={ on_menu.reform(|_| ()) }>
+                    <button class="menu-btn" data-testid="menu-btn" onclick={ link.callback(|_| Msg::Menu) }>
                         { "Menu" }
                     </button>
-                    <button class="menu-btn learn-btn" data-testid="learn-btn" onclick={ on_learn.reform(|_| ()) }>
+                    <button class="menu-btn learn-btn" data-testid="learn-btn" onclick={ link.callback(|_| Msg::LearnToggle) }>
                         { if teaching { "Hide learning" } else { "Learn" } }
                     </button>
-                    <button class="menu-btn showme-btn" data-testid="showme-btn" onclick={ on_showme.reform(|_| ()) }>
+                    <button class="menu-btn showme-btn" data-testid="showme-btn" onclick={ link.callback(|_| Msg::ShowMeToggle) }>
                         { if game.show_me { "Stop show-me" } else { "Show me" } }
                     </button>
                     <button
                         class={ if notes { "menu-btn notes-btn on" } else { "menu-btn notes-btn" } }
                         data-testid="notes-btn"
-                        onclick={ on_notes.reform(|_| ()) }>
+                        onclick={ link.callback(|_| Msg::NotesToggle) }>
                         { if notes { "Notes on" } else { "Notes" } }
                     </button>
-                    <button class="menu-btn help-btn" data-testid="help-btn" onclick={ on_help.reform(|_| ()) }>
+                    <button class="menu-btn help-btn" data-testid="help-btn" onclick={ link.callback(|_| Msg::HelpToggle) }>
                         { "?" }
                     </button>
                 </div>
@@ -109,15 +90,17 @@ pub fn view_board(
                     <span class="bad" data-testid="bad-count">{ format!("bad: {}", game.bad_inputs) }</span>
                 </div>
             </header>
-            { if mode == InputMode::Above { { pad(game, &on_digit, &on_erase) } } else { html! {} } }
-            { grid(game, &highlights, &on_select, &on_digit, &on_erase, show_marks, mode) }
-            { if mode == InputMode::Below { { pad(game, &on_digit, &on_erase) } } else { html! {} } }
+            { if mode == InputMode::Above { pad(game, link) } else { html! {} } }
+            { grid(game, &highlights, show_marks, mode, link) }
+            { if mode == InputMode::Below { pad(game, link) } else { html! {} } }
             { if teaching {
-                crate::learn::learn_panel(game, &on_learn, &on_pick, &on_step, &on_auto, &on_delay, &on_note_apply, &on_note_apply_all, &on_note_reset)
+                crate::learn::learn_panel(game, &link.callback(|_| Msg::LearnToggle), &link.callback(Msg::LearnSelect), &link.callback(|d: isize| Msg::LearnStep(d)), &link.callback(Msg::ShowMeAuto), &link.callback(Msg::ShowMeDelay), &link.callback(|_| Msg::NoteApply), &link.callback(|_| Msg::NoteApplyAll), &link.callback(|_| Msg::NoteReset))
             } else { html! {} } }
-            { customize_bar(mode, &on_mode) }
+            <button class="menu-btn customize-trigger" data-testid="customize-open" onclick={ link.callback(|_| Msg::CustomizeToggle) }>
+                { "Customize" }
+            </button>
             if game.won {
-                { overlay(game, &on_next, &on_menu) }
+                { overlay(game, link) }
             }
         </main>
     }
@@ -126,12 +109,13 @@ pub fn view_board(
 fn grid(
     game: &Game,
     highlights: &[usize],
-    on_select: &Callback<usize>,
-    on_digit: &Callback<u8>,
-    on_erase: &Callback<()>,
     show_marks: bool,
     mode: InputMode,
+    link: &Scope<Model>,
 ) -> Html {
+    let on_select = link.callback(Msg::Select);
+    let on_digit = link.callback(Msg::Digit);
+    let on_erase = link.callback(|_| Msg::Erase);
     let marks = if show_marks {
         Some(game.pencil_marks())
     } else {
@@ -143,13 +127,13 @@ fn grid(
             game,
             idx,
             highlights,
-            on_select,
+            &on_select,
             marks.as_ref().map(|m| &m[..]),
             view.as_ref(),
         )
     });
     let keypad = if mode == InputMode::Popup && keypad_visible(game) {
-        keypad_view(game, on_digit, on_erase)
+        keypad_view(game, &on_digit, &on_erase)
     } else {
         html! {}
     };
@@ -211,7 +195,9 @@ fn keypad_view(game: &Game, on_digit: &Callback<u8>, on_erase: &Callback<()>) ->
     }
 }
 
-fn pad(game: &Game, on_digit: &Callback<u8>, on_erase: &Callback<()>) -> Html {
+fn pad(game: &Game, link: &Scope<Model>) -> Html {
+    let on_digit = link.callback(Msg::Digit);
+    let on_erase = link.callback(|_| Msg::Erase);
     html! {
         <div class="pad" data-testid="pad">
             { for (1..=9u8).map(|d| {
@@ -233,34 +219,8 @@ fn pad(game: &Game, on_digit: &Callback<u8>, on_erase: &Callback<()>) -> Html {
     }
 }
 
-/// Collapsible bar near the bottom choosing where the digit input
-/// surface lives: a fixed pad above or below the board, or the
-/// per-cell popup keypad.
-fn customize_bar(mode: InputMode, on_mode: &Callback<InputMode>) -> Html {
-    let option = |m: InputMode, text: &str| {
-        let on = mode == m;
-        html! {
-            <button
-                class={ if on { "mode-btn on" } else { "mode-btn" } }
-                data-testid={ format!("customize-{m}") }
-                onclick={ on_mode.reform(move |_| m) }>
-                { text }
-            </button>
-        }
-    };
-    html! {
-        <details class="customize" data-testid="customize">
-            <summary>{ "Customize" }</summary>
-            <div class="customize-row">
-                { option(InputMode::Above, "Pad above board") }
-                { option(InputMode::Below, "Pad below board") }
-                { option(InputMode::Popup, "Popup keypad") }
-            </div>
-        </details>
-    }
-}
-
-fn overlay(game: &Game, on_next: &Callback<()>, on_menu: &Callback<()>) -> Html {
+fn overlay(game: &Game, link: &Scope<Model>) -> Html {
+    let on_next = link.callback(|_| Msg::NextBoard);
     html! {
         <div class="overlay win-flash" data-testid="win-overlay">
             <div class="overlay-card">
@@ -270,7 +230,7 @@ fn overlay(game: &Game, on_next: &Callback<()>, on_menu: &Callback<()>) -> Html 
                 <button class="level-btn" data-testid="next-board" onclick={ on_next.reform(|_| ()) }>
                     { "Next board" }
                 </button>
-                <button class="level-btn" data-testid="overlay-menu" onclick={ on_menu.reform(|_| ()) }>
+                <button class="level-btn" data-testid="overlay-menu" onclick={ link.callback(|_| Msg::Menu) }>
                     { "Menu" }
                 </button>
             </div>

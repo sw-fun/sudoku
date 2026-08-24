@@ -1,65 +1,71 @@
-//! Menu screen: difficulty selection, the stats view, and the
-//! help overlay dialog.
+//! Menu screen (difficulty selection, stats, resume, help overlay),
+//! the customize and abandon dialogs, and the localStorage handle.
 
 use std::collections::BTreeMap;
 use suduko_engine::Level;
 use suduko_game::Game;
+use suduko_uikit::InputMode;
 use yew::html::Scope;
 use yew::prelude::*;
 
 use crate::app::{Model, Msg};
+
+/// The five levels in published (band) order; index is the save-slot
+/// encoding of a level.
+pub(crate) const LEVELS: [Level; 5] = [
+    Level::Easy,
+    Level::Medium,
+    Level::Hard,
+    Level::Harder,
+    Level::Hardest,
+];
 
 /// Fresh time-derived seed so the next board differs from the last.
 pub(crate) fn next_seed() -> u64 {
     js_sys::Date::now() as u64
 }
 
-fn label(level: Level) -> &'static str {
-    match level {
-        Level::Easy => "Easy",
-        Level::Medium => "Medium",
-        Level::Hard => "Hard",
-        Level::Harder => "Harder",
-        Level::Hardest => "Hardest",
-    }
+/// localStorage handle for the save slot; `None` when storage is
+/// unavailable (private mode, etc.) - the game then simply does not
+/// persist.
+pub(crate) fn storage() -> Option<web_sys::Storage> {
+    web_sys::window()?.local_storage().ok()?
 }
 
-fn levels() -> [Level; 5] {
-    [
-        Level::Easy,
-        Level::Medium,
-        Level::Hard,
-        Level::Harder,
-        Level::Hardest,
-    ]
-}
-
-fn stats_line(stats: &BTreeMap<Level, u32>) -> String {
-    levels()
+pub fn view_menu(
+    link: &Scope<Model>,
+    stats: &BTreeMap<Level, u32>,
+    resume: Option<(&str, &str)>,
+) -> Html {
+    let line = LEVELS
         .iter()
-        .map(|&l| format!("{}: {}", label(l), stats.get(&l).copied().unwrap_or(0)))
+        .map(|l| format!("{}: {}", l.label(), stats.get(l).copied().unwrap_or(0)))
         .collect::<Vec<_>>()
-        .join("  ")
-}
-
-pub fn view_menu(link: &Scope<Model>, stats: &BTreeMap<Level, u32>) -> Html {
+        .join("  ");
     html! {
         <main class="menu" data-testid="menu">
-            <h1>{ "Suduko" }</h1>
-            <p class="stats" data-testid="stats">{ stats_line(stats) }</p>
+            <h1>{ "Learn/Practice Sudoku" }</h1>
+            <p class="stats" data-testid="stats">{ line }</p>
             <div class="levels">
-                { for levels().iter().map(|&l| {
+                { for LEVELS.iter().map(|&l| {
                     let start = link.callback(move |_| Msg::Start(l));
                     html! {
                         <button
                             class="level-btn"
-                            data-testid={ format!("start-{}", label(l).to_lowercase()) }
+                            data-testid={ format!("start-{}", l.label().to_lowercase()) }
                             onclick={ start }>
-                            { label(l) }
+                            { l.label() }
                         </button>
                     }
                 }) }
             </div>
+            { if let Some((level_label, elapsed)) = resume {
+                html! {
+                    <button class="level-btn resume" data-testid="resume" onclick={ link.callback(|_| Msg::Resume) }>
+                        { format!("Resume {level_label} board ({elapsed})") }
+                    </button>
+                }
+            } else { html! {} } }
             <p class="hint">{ "Pick a difficulty to start." }</p>
         </main>
     }
@@ -77,9 +83,79 @@ pub(crate) fn start_game(level: Level, seed: u64) -> Game {
     Game::from_puzzle(&puzzle)
 }
 
+/// The customize dialog: choose where the digit input lives and clear
+/// the saved stats. Clicking outside or the X (or Escape) closes it.
+pub fn customize_popup(mode: InputMode, link: &Scope<Model>) -> Html {
+    let on_mode = link.callback(Msg::InputModeSet);
+    let on_clear_stats = link.callback(|_| Msg::ClearStats);
+    let on_close = link.callback(|_| Msg::CustomizeToggle);
+    let option = |m: InputMode| {
+        let on = mode == m;
+        let text = match m {
+            InputMode::Above => "Pad above board",
+            InputMode::Below => "Pad below board",
+            InputMode::Popup => "Popup keypad",
+        };
+        html! {
+            <button
+                class={ if on { "mode-btn on" } else { "mode-btn" } }
+                data-testid={ format!("customize-{m}") }
+                onclick={ on_mode.reform(move |_| m) }>
+                { text }
+            </button>
+        }
+    };
+    html! {
+        <div class="overlay" data-testid="customize-overlay" onclick={ on_close.reform(|_| ()) }>
+            <div class="overlay-card custom-card" onclick={ |e: MouseEvent| e.stop_propagation() }>
+                <button class="close-x" data-testid="customize-close" onclick={ on_close.reform(|_| ()) }>
+                    { "x" }
+                </button>
+                <h2>{ "Customize" }</h2>
+                <p class="dialog-hint">{ "Where should the number buttons live?" }</p>
+                <div class="customize-row">
+                    { option(InputMode::Above) }
+                    { option(InputMode::Below) }
+                    { option(InputMode::Popup) }
+                </div>
+                <button class="level-btn danger" data-testid="clear-stats" onclick={ on_clear_stats.reform(|_| ()) }>
+                    { "Clear stats" }
+                </button>
+            </div>
+        </div>
+    }
+}
+
+/// The abandon-progress confirmation shown when leaving an
+/// unfinished board. Yes discards the board (stats are kept); No,
+/// the X, or clicking outside keeps playing.
+pub fn abandon_dialog(link: &Scope<Model>) -> Html {
+    let on_answer = link.callback(Msg::Abandon);
+    html! {
+        <div class="overlay" data-testid="abandon-overlay" onclick={ on_answer.reform(|_| false) }>
+            <div class="overlay-card custom-card" onclick={ |e: MouseEvent| e.stop_propagation() }>
+                <button class="close-x" data-testid="abandon-close" onclick={ on_answer.reform(|_| false) }>
+                    { "x" }
+                </button>
+                <h2>{ "Abandon this board?" }</h2>
+                <p class="dialog-hint">{ "Your progress on this board will be lost (stats are kept)." }</p>
+                <div class="customize-row">
+                    <button class="level-btn danger" data-testid="abandon-yes" onclick={ on_answer.reform(|_| true) }>
+                        { "Abandon" }
+                    </button>
+                    <button class="level-btn" data-testid="abandon-no" onclick={ on_answer.reform(|_| false) }>
+                        { "Keep playing" }
+                    </button>
+                </div>
+            </div>
+        </div>
+    }
+}
+
 /// The help dialog rendered above the live board; the game keeps
 /// running underneath. Closing returns to the untouched board.
-pub fn help_overlay(on_close: Callback<()>) -> Html {
+pub fn help_overlay(link: &Scope<Model>) -> Html {
+    let on_close = link.callback(|_| Msg::HelpToggle);
     html! {
         <div class="overlay help-overlay" data-testid="help-overlay" onclick={ on_close.reform(|_| ()) }>
             <div
