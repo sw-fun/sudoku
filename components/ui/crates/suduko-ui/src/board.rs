@@ -116,10 +116,10 @@ pub fn view_board(
                 </div>
             </header>
             { grid(game, &highlights, &on_select, show_marks) }
+            { pad(game, &on_digit, &on_erase) }
             { if teaching {
                 crate::learn::learn_panel(game, &on_learn, &on_pick, &on_step, &on_auto, &on_delay, &on_note_apply, &on_note_apply_all, &on_note_reset)
             } else { html! {} } }
-            { pad(game, &on_digit, &on_erase) }
             if game.won {
                 { overlay(game, &on_next, &on_menu) }
             }

@@ -1,0 +1,1 @@
+User feedback: the 1-9/Erase pad sits too low when the Learn or Show-Me panel is open (it renders after the panel). Reorder the game view so the pad renders directly below the board and the Learn/Show-Me panel renders below the pad. Pure presentational reorder in suduko-ui board.rs; rebuild pages via scripts/build-pages.sh; just check green; named-file staging; push origin main.

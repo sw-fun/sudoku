@@ -1,0 +1,1 @@
+Reordered the game view so the 1-9/Erase pad renders directly below the board and the Learn/Show-Me panel (both use the same teaching panel) renders below the pad; user reported the pad sat too low when a dialog was open. Pure presentational reorder in board.rs view_board; pages rebuilt via scripts/build-pages.sh; just check green.

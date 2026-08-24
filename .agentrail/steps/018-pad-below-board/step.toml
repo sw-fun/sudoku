@@ -1,0 +1,9 @@
+number = 18
+slug = "pad-below-board"
+status = "completed"
+description = "User feedback: the 1-9/Erase pad sits too low when the Learn or Show-Me panel..."
+role = "production"
+context_files = []
+created_at = "2026-08-24T07:54:02"
+completed_at = "2026-08-24T07:55:12"
+commits = ["b5564825ad3988271896c78c75b7f33679050806"]
