@@ -2,7 +2,7 @@
   "name": "Learn/Practice Sudoku",
   "short_name": "Sudoku",
   "description": "Learn and practice Sudoku with guided strategy walkthroughs",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "start_url": "/sudoku/",
   "scope": "/sudoku/",
   "display": "standalone",

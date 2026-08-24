@@ -21,8 +21,8 @@
     <link rel="stylesheet" href="/sudoku/main-5b882f1307a2ab76.css" integrity="sha384-kdvlijzXDLj9xC/xHvhNSy5whyvBF7knR1bYYlPK8RwzLrWwo9hVj/kAH1Tqj78Q"/>
     
 <script type="module">
-import init, * as bindings from '/sudoku/suduko-ui-d762a216672eb5d7.js';
-const wasm = await init({ module_or_path: '/sudoku/suduko-ui-d762a216672eb5d7_bg.wasm' });
+import init, * as bindings from '/sudoku/suduko-ui-68f62b1886a94200.js';
+const wasm = await init({ module_or_path: '/sudoku/suduko-ui-68f62b1886a94200_bg.wasm' });
 
 
 window.wasmBindings = bindings;
@@ -31,7 +31,7 @@ window.wasmBindings = bindings;
 dispatchEvent(new CustomEvent("TrunkApplicationStarted", {detail: {wasm}}));
 
 </script>
-  <link rel="modulepreload" href="/sudoku/suduko-ui-d762a216672eb5d7.js" crossorigin="anonymous" integrity="sha384-8dTQR6Z0Q/iAfXuPeay3DczYc7/dKVmfLekdjeFAUSl14z91QbwGh+sAQAMXnaAL"><link rel="preload" href="/sudoku/suduko-ui-d762a216672eb5d7_bg.wasm" crossorigin="anonymous" integrity="sha384-nlAzq494UeVmiJnyMoMBIxagVtolDzyzCq3n8SblMbLj0+oExtit9+z2rK0hHHDB" as="fetch" type="application/wasm"></head>
+  <link rel="modulepreload" href="/sudoku/suduko-ui-68f62b1886a94200.js" crossorigin="anonymous" integrity="sha384-AWGnyifJGz/GR1fQNZLxfJRX/LCe5W4lg92nwLb+G/7XrnoaTGfJqr0lBIC/cxof"><link rel="preload" href="/sudoku/suduko-ui-68f62b1886a94200_bg.wasm" crossorigin="anonymous" integrity="sha384-LxlaRy3D4stJcHdY22/jePYDDVmhE1boVESM8/EpasMEDExz+eUDIiqX28nQ06Qc" as="fetch" type="application/wasm"></head>
   <body>
     <div id="app"></div>
     <a

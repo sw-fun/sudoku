@@ -107,19 +107,19 @@ impl Component for Model {
             Msg::Select(idx) => self.mut_game(|g| g.select(idx)),
             Msg::Digit(d) => self.mut_game(|g| entry(g, d)),
             Msg::Erase => self.mut_game(clear_selected),
-            Msg::InputModeSet(mode) => self.input_mode = mode,
+            Msg::InputModeSet(m) => self.input_mode = m,
             Msg::Tick => {
                 self.mut_game(|g| {
-                    if !g.won {
-                        g.elapsed_secs += 1;
-                    }
+                    g.elapsed_secs += u32::from(!g.won);
                     suduko_game::showme::tick(g);
                 });
             }
             Msg::Menu | Msg::ContextKey(crate::keys::Key::Escape) => return self.escape(),
             Msg::ContextKey(crate::keys::Key::Space) => self.mut_game(clear_selected),
             Msg::ContextKey(crate::keys::Key::Digit(d)) => self.mut_game(|g| entry(g, d)),
-            Msg::Resume => self.screen = Screen::Game,
+            Msg::Resume => {
+                self.screen = Screen::Game;
+            }
             Msg::Abandon(true) => {
                 (self.confirm_open, self.game, self.screen) = (false, None, Screen::Menu);
             }
@@ -128,7 +128,6 @@ impl Component for Model {
             Msg::CustomizeToggle => self.customize_open = !self.customize_open,
             Msg::NextBoard => {
                 if self.game.as_ref().is_some_and(|g| g.won) {
-                    *self.stats.entry(self.level).or_default() += 1;
                     self.game = Some(start_game(self.level, next_seed()));
                 }
             }
@@ -200,10 +199,16 @@ impl Model {
         true
     }
 
-    /// Runs a game mutation and persists afterwards.
+    /// Runs a game mutation, tallies a win the moment any mutation
+    /// finishes the board (placement, show-me step, or tick), and
+    /// persists afterwards.
     fn mut_game(&mut self, f: impl FnOnce(&mut Game)) {
+        let was_won = self.game.as_ref().is_some_and(|g| g.won);
         if let Some(g) = self.game.as_mut() {
             f(g);
+            if g.won && !was_won {
+                *self.stats.entry(self.level).or_default() += 1;
+            }
             self.persist();
         }
     }

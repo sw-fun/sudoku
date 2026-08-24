@@ -1,0 +1,8 @@
+number = 21
+slug = "stats-tally-fix"
+status = "pending"
+description = "Bug: completing a board (including via show me) never raised the win count - ..."
+role = "production"
+context_files = []
+created_at = "2026-08-24T11:32:21"
+commits = []
