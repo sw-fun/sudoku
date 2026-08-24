@@ -9,6 +9,8 @@ spacebar, Backspace, or Delete.
 
 ![Menu](docs/images/menu.png)
 
+![Menu with an in-progress board offering Resume](docs/images/menu-resume.png)
+
 ![Board in play](docs/images/board-in-play.png)
 
 ![Customize dialog](docs/images/customize-dialog.png)
