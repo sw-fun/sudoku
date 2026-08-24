@@ -1,8 +1,9 @@
 number = 22
 slug = "user-notes-modes"
-status = "in-progress"
+status = "completed"
 description = "User feedback: 'I want to enter notes myself' - three-state notes. NotesMode ..."
 role = "production"
 context_files = []
 created_at = "2026-08-24T12:44:37"
-commits = []
+completed_at = "2026-08-24T12:52:36"
+commits = ["dc89c94beb78c38bb275b94c2d9bbeca48081ede"]
