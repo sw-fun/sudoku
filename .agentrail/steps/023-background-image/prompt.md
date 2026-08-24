@@ -1,0 +1,1 @@
+Add color-numbers-bg.jpg (from ~/Dropbox/FilesSharedWithWMA/images/) as the app background: copy into suduko-ui crate, trunk copy-file, body::before fixed full-viewport layer with opacity ~0.15, z-index -1 (below all UI), background-size cover; body keeps the solid #f7f8fa fallback. Verify over served bundle; bump 0.6.3; rebuild pages; just check green; push.

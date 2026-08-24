@@ -6,6 +6,18 @@ body {
   color: #222;
 }
 
+/* Full-viewport background image, faded and beneath every other UI
+   element: a body::before layer pinned behind the content (z-index
+   -1), so panels, the board, and dialogs all stack above it. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: url("color-numbers-bg.jpg") center/cover no-repeat;
+  opacity: 0.15;
+  z-index: -1;
+}
+
 .menu {
   max-width: 28rem;
   margin: 3rem auto;
