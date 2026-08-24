@@ -1,8 +1,12 @@
 number = 20
 slug = "yew-persistence-polish"
-status = "in-progress"
+status = "completed"
 description = "Per docs/sagas.md step 2: versioned cookie persistence of game state (current..."
 role = "validation"
 context_files = []
 created_at = "2026-08-18T21:39:03"
-commits = ["5e2c9a9d83ba87959291449a4e55bb33cdf1ee24"]
+completed_at = "2026-08-24T11:33:15"
+commits = [
+    "5e2c9a9d83ba87959291449a4e55bb33cdf1ee24",
+    "8943c4fd39247672278f9ea7acf8f8caa50242a8",
+]
