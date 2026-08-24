@@ -43,20 +43,34 @@ pub fn erase(game: &mut Game, idx: usize) {
 /// Enters `digit` into the selected cell, if one is selected. In
 /// notes mode the digit toggles a pencil-mark candidate instead of
 /// placing (empty cells only; computed candidates are never restored
-/// beyond what the rules allow).
+/// beyond what the rules allow). A placement closes the cell keypad.
 pub fn entry(game: &mut Game, digit: u8) {
     let Some(&sel) = game.selected.as_ref() else {
         return;
     };
     if game.notes_mode {
-        toggle_mark(game, sel, digit);
+        if game.shown(sel) != 0 {
+            return;
+        }
+        let base = suduko_tutor::candidates_with(&game.shown_values(), &[]);
+        if base.masks[sel] & (1 << (digit - 1)) == 0 {
+            return;
+        }
+        let entry = (sel, digit);
+        if game.eliminated.contains(&entry) {
+            game.eliminated.retain(|&e| e != entry);
+        } else {
+            game.eliminated.push(entry);
+        }
         return;
     }
     set_value(game, sel, digit);
+    game.keypad_open = false;
 }
 
 /// Erases the selected cell, if one is selected. In notes mode it
-/// restores the selected cell's computed candidates instead.
+/// restores the selected cell's computed candidates instead. Erasing
+/// closes the cell keypad.
 pub fn clear_selected(game: &mut Game) {
     let Some(&sel) = game.selected.as_ref() else {
         return;
@@ -66,25 +80,18 @@ pub fn clear_selected(game: &mut Game) {
         return;
     }
     erase(game, sel);
+    game.keypad_open = false;
 }
 
-/// Toggles one user candidate mark in the selected empty cell:
-/// removals join the elimination layer, repeat-typing removes the
-/// removal (marks that the rules exclude are ignored).
-fn toggle_mark(game: &mut Game, idx: usize, digit: u8) {
-    if game.shown(idx) != 0 {
-        return;
-    }
-    let base = suduko_tutor::candidates_with(&game.shown_values(), &[]);
-    if base.masks[idx] & (1 << (digit - 1)) == 0 {
-        return;
-    }
-    let entry = (idx, digit);
-    if game.eliminated.contains(&entry) {
-        game.eliminated.retain(|&e| e != entry);
-    } else {
-        game.eliminated.push(entry);
-    }
+/// True when the cell keypad should render: explicitly open, a
+/// non-given selection, and none of the modes where a value popup
+/// would be wrong or distracting. Button rules live in suduko-uikit.
+pub fn keypad_visible(game: &Game) -> bool {
+    game.keypad_open
+        && game.selected.is_some_and(|sel| !game.is_given(sel))
+        && !game.notes_mode
+        && !game.show_me
+        && !game.won
 }
 
 /// Highlight set for the selected cell: its 20 peers when empty, else

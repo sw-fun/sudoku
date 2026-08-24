@@ -1,0 +1,9 @@
+[package]
+name = "suduko-uikit"
+description = "Pure UI kit for the Sudoku app: input modes, keypad geometry, and enablement rules over plain data"
+edition.workspace = true
+version.workspace = true
+license.workspace = true
+
+[lints]
+workspace = true

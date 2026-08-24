@@ -9,3 +9,17 @@ pub enum Level {
     Harder,
     Hardest,
 }
+
+impl Level {
+    /// Display label shown in the game header and menus.
+    #[must_use]
+    pub fn label(self) -> &'static str {
+        match self {
+            Self::Easy => "Easy",
+            Self::Medium => "Medium",
+            Self::Hard => "Hard",
+            Self::Harder => "Harder",
+            Self::Hardest => "Hardest",
+        }
+    }
+}

@@ -35,6 +35,7 @@ pub fn from_puzzle(puzzle: &Puzzle) -> Game {
         show_me_wait: 0,
         eliminated: Vec::new(),
         notes_mode: false,
+        keypad_open: false,
     }
 }
 

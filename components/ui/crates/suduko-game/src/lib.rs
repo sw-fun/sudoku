@@ -12,7 +12,7 @@ mod teaching;
 mod trial;
 
 pub use build::from_strings;
-pub use input::{Outcome, clear_selected, entry, erase, highlight_set, set_value};
+pub use input::{Outcome, clear_selected, entry, erase, highlight_set, keypad_visible, set_value};
 pub use learn::{NoteOp, Pulse, StepView, note};
 pub use teaching::Teaching;
 
@@ -55,6 +55,8 @@ pub struct Game {
     /// Notes mode: digit entry toggles pencil marks instead of
     /// placing values.
     pub notes_mode: bool,
+    /// Cell keypad popup is open on the selected cell.
+    pub keypad_open: bool,
 }
 
 impl Game {
@@ -81,7 +83,13 @@ impl Game {
     }
 
     pub fn select(&mut self, idx: usize) {
-        self.selected = Some(idx);
+        if self.selected == Some(idx) {
+            // Retapping the selected cell toggles the keypad popup.
+            self.keypad_open = !self.keypad_open;
+        } else {
+            self.selected = Some(idx);
+            self.keypad_open = true;
+        }
     }
 
     /// True when every cell is filled and agrees with the solution.

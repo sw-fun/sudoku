@@ -58,6 +58,13 @@ and a global build lock (`scripts/serial.sh`).
 - `components/ui`
   - `suduko-ui` - Yew/WASM frontend (board rendering, input, stats,
     cookie-persisted game state; under construction).
+- `components/uikit`
+  - `suduko-uikit` - pure UI kit over plain data (no browser types):
+    `InputMode` (pad above/below the board or the per-cell popup
+    keypad), keypad anchor geometry + inline style strings, keypad
+    button enablement rules (`CellInput`), and shared `mmss` time
+    formatting. Consumed by `suduko-ui`; kept decoupled from game
+    state for TDD.
 
 ## Commands
 

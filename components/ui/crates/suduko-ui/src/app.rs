@@ -8,6 +8,7 @@ use gloo_timers::callback::Interval;
 use std::collections::BTreeMap;
 use suduko_engine::Level;
 use suduko_game::{Game, NoteOp, clear_selected, entry, note};
+use suduko_uikit::InputMode;
 use yew::prelude::*;
 
 pub(crate) enum Msg {
@@ -15,6 +16,7 @@ pub(crate) enum Msg {
     Select(usize),
     Digit(u8),
     Erase,
+    InputModeSet(InputMode),
     Tick,
     Menu,
     NextBoard,
@@ -40,6 +42,7 @@ pub(crate) struct Model {
     stats: BTreeMap<Level, u32>,
     seed: u64,
     help_open: bool,
+    input_mode: InputMode,
     _timer: Interval,
 }
 
@@ -62,6 +65,7 @@ impl Component for Model {
             stats: BTreeMap::new(),
             seed: next_seed(),
             help_open: false,
+            input_mode: InputMode::Below,
             _timer: timer,
         }
     }
@@ -69,8 +73,7 @@ impl Component for Model {
     fn update(&mut self, _ctx: &Context<Self>, msg: Msg) -> bool {
         match msg {
             Msg::Start(level) => {
-                self.level = level;
-                self.seed = next_seed();
+                (self.level, self.seed) = (level, next_seed());
                 self.game = Some(start_game(level, self.seed));
                 self.screen = Screen::Game;
                 true
@@ -78,6 +81,10 @@ impl Component for Model {
             Msg::Select(idx) => self.mut_game(|g| g.select(idx)),
             Msg::Digit(d) => self.mut_game(|g| entry(g, d)),
             Msg::Erase => self.mut_game(clear_selected),
+            Msg::InputModeSet(mode) => {
+                self.input_mode = mode;
+                true
+            }
             Msg::Tick => self.mut_game(|g| {
                 if !g.won {
                     g.elapsed_secs += 1;
@@ -122,9 +129,11 @@ impl Component for Model {
                     let board = view_board(
                         game,
                         self.level,
+                        self.input_mode,
                         ctx.link().callback(Msg::Select),
                         ctx.link().callback(Msg::Digit),
                         ctx.link().callback(|_| Msg::Erase),
+                        ctx.link().callback(Msg::InputModeSet),
                         ctx.link().callback(|_| Msg::Menu),
                         ctx.link().callback(|_| Msg::NextBoard),
                         ctx.link().callback(|_| Msg::LearnToggle),

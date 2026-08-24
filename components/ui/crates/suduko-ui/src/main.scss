@@ -224,11 +224,90 @@ body {
 }
 
 .board {
+  position: relative;
   display: grid;
   grid-template-columns: repeat(9, 1fr);
   border: 3px solid #222;
   width: fit-content;
   margin: 0 auto;
+}
+
+/* Mini keypad that opens on a tapped cell; anchored beside the cell
+   toward the board center via inline top/left/right/bottom calc.
+   Inverted (dark) with a touch of transparency so it pops over the
+   light board. */
+.cell-keypad {
+  position: absolute;
+  display: grid;
+  grid-template-columns: repeat(3, calc(var(--cell) * 0.92));
+  grid-auto-rows: calc(var(--cell) * 0.92);
+  gap: 2px;
+  padding: 3px;
+  background: rgba(17, 24, 39, 0.88);
+  border: 2px solid #111827;
+  border-radius: 8px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+  z-index: 3;
+}
+
+.ck-btn {
+  font-size: 1rem;
+  padding: 0;
+  border: 1px solid rgba(148, 163, 184, 0.6);
+  border-radius: 6px;
+  background: rgba(51, 65, 85, 0.85);
+  color: #f1f5f9;
+  cursor: pointer;
+}
+
+.ck-btn.erase {
+  grid-column: 1 / 4;
+  font-size: 0.85rem;
+}
+
+.ck-btn:disabled {
+  background: rgba(30, 41, 59, 0.6);
+  border-color: rgba(100, 116, 139, 0.4);
+  color: #64748b;
+  cursor: default;
+}
+
+/* Collapsible input-mode chooser rendered near the bottom. */
+.customize {
+  margin-top: 0.6rem;
+  text-align: center;
+}
+
+.customize summary {
+  display: inline-block;
+  font-size: 0.85rem;
+  color: #555;
+  border: 1px solid #bbb;
+  border-radius: 6px;
+  background: #fff;
+  padding: 0.2rem 0.6rem;
+  cursor: pointer;
+}
+
+.customize-row {
+  display: flex;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0 0.1rem;
+}
+
+.mode-btn {
+  font-size: 0.8rem;
+  padding: 0.25rem 0.5rem;
+  border: 1px solid #9db2d6;
+  border-radius: 6px;
+  background: #fff;
+  cursor: pointer;
+}
+
+.mode-btn.on {
+  background: #dcebfd;
+  border-color: #1663d9;
 }
 
 .cell {
