@@ -11,6 +11,10 @@ spacebar, Backspace, or Delete.
 
 ![Board in play](docs/images/board-in-play.png)
 
+![Customize dialog](docs/images/customize-dialog.png)
+
+![Abandon confirmation](docs/images/abandon-dialog.png)
+
 ![Learn mode](docs/images/learn-mode.png)
 
 ![Show me](docs/images/show-me.png)
