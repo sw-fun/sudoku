@@ -1,0 +1,1 @@
+Fixed win counts stuck at zero (tally moved to the won-transition inside mut_game; verified end-to-end over the served bundle with a codec-crafted near-won save: stats 0=2 -> 0=3 persisted across reload). Workspaces at 0.6.1, pages rebuilt. just check green. Commits 8943c4f + a2df55a.

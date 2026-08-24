@@ -1,4 +1,5 @@
-//! Where the digit input surface renders.
+//! Where the digit input surface lives, and how pencil notes
+//! behave.
 
 use std::fmt;
 
@@ -24,5 +25,51 @@ impl fmt::Display for InputMode {
             Self::Popup => "popup",
         };
         f.write_str(text)
+    }
+}
+
+/// Pencil-note behavior. The header Notes button cycles the three.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub enum NotesMode {
+    /// No marks; digit entry places values.
+    #[default]
+    Off,
+    /// Player-entered marks only (start empty); digits toggle marks.
+    User,
+    /// App-filled computed candidates; digits strike them out.
+    Auto,
+}
+
+impl NotesMode {
+    /// Header button label for the mode.
+    #[must_use]
+    pub fn label(self) -> &'static str {
+        match self {
+            Self::Off => "Notes",
+            Self::User => "Notes: mine",
+            Self::Auto => "Notes: auto",
+        }
+    }
+
+    /// The next mode when the header button cycles: off -> user ->
+    /// auto -> off.
+    #[must_use]
+    pub fn next(self) -> Self {
+        match self {
+            Self::Off => Self::User,
+            Self::User => Self::Auto,
+            Self::Auto => Self::Off,
+        }
+    }
+
+    /// Save-slot encoding of the mode, or `None` for a bad index.
+    #[must_use]
+    pub fn from_index(idx: u8) -> Option<Self> {
+        match idx {
+            0 => Some(Self::Off),
+            1 => Some(Self::User),
+            2 => Some(Self::Auto),
+            _ => None,
+        }
     }
 }

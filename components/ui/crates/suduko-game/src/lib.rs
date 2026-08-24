@@ -14,6 +14,7 @@ mod trial;
 pub use build::{Save, from_strings, restore, save};
 pub use input::{Outcome, clear_selected, entry, erase, highlight_set, keypad_visible, set_value};
 pub use learn::{NoteOp, Pulse, StepView, note};
+pub use suduko_uikit::NotesMode;
 pub use teaching::Teaching;
 
 use suduko_grid::CELL_COUNT;
@@ -52,9 +53,10 @@ pub struct Game {
     pub show_me_wait: u32,
     /// Solver eliminations: candidates removed but not yet placed.
     pub eliminated: Vec<(usize, u8)>,
-    /// Notes mode: digit entry toggles pencil marks instead of
-    /// placing values.
-    pub notes_mode: bool,
+    /// Notes mode: off, player-entered, or app-filled candidates.
+    pub notes: suduko_uikit::NotesMode,
+    /// Player-entered pencil marks, one 9-bit mask per cell.
+    pub user_marks: [u16; CELL_COUNT],
     /// Cell keypad popup is open on the selected cell.
     pub keypad_open: bool,
 }

@@ -172,9 +172,10 @@ pub fn help_overlay(link: &Scope<Model>) -> Html {
                 </ul>
                 <h2>{ "Pencil marks" }</h2>
                 <ul>
-                    <li>{ "Notes shows candidate marks in every empty cell while you play." }</li>
-                    <li>{ "With Notes on, typing (or tapping) a digit toggles that candidate in the selected cell; Erase restores the cell's computed candidates." }</li>
-                    <li>{ "In Learn, Apply these removals applies one strategy's eliminations to your marks; the picker's Apply all does every listed elimination at once (placements stay yours to make)." }</li>
+                    <li>{ "The Notes button cycles three modes: off, Notes: mine, Notes: auto." }</li>
+                    <li>{ "Notes: mine starts empty - type (or tap) a digit in a selected empty cell to pencil in your own candidate; repeat it to remove. Erase clears the cell's marks. Your marks are saved with the game." }</li>
+                    <li>{ "Notes: auto fills every empty cell with the app's computed candidates; typing a digit strikes it out, and Erase restores the cell's computed set." }</li>
+                    <li>{ "In Learn, Apply these removals applies one strategy's eliminations to the marks; the picker's Apply all does every listed elimination at once (placements stay yours to make)." }</li>
                     <li>{ "Reset marks clears all removals and returns to computed candidates." }</li>
                 </ul>
                 <h2>{ "Learn mode" }</h2>

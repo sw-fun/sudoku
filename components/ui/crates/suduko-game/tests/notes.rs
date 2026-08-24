@@ -1,7 +1,7 @@
 //! Pencil-note layer: user-owned candidate removals.
 
 use suduko_game::showme;
-use suduko_game::{Game, NoteOp, clear_selected, entry, from_strings, note};
+use suduko_game::{Game, NoteOp, NotesMode, clear_selected, entry, from_strings, note};
 
 /// Wikipedia easy clues and its solution.
 const CLUES: &str =
@@ -18,7 +18,7 @@ fn notes_mode_entry_toggles_a_candidate_and_erase_restores_the_cell() {
     let mut g = game();
     g.select(2); // r1c3, empty; solution 4, computed marks contain 4
     assert!(g.pencil_marks()[2].contains(&4));
-    g.notes_mode = true;
+    g.notes = NotesMode::Auto;
     entry(&mut g, 4);
     assert!(
         !g.pencil_marks()[2].contains(&4),
@@ -42,7 +42,7 @@ fn notes_mode_entry_toggles_a_candidate_and_erase_restores_the_cell() {
 fn notes_mode_entry_never_places_digits() {
     let mut g = game();
     g.select(2);
-    g.notes_mode = true;
+    g.notes = NotesMode::Auto;
     entry(&mut g, 4);
     entry(&mut g, 4); // toggle twice
     assert_eq!(g.user[2], 0, "notes mode never writes cell values");
@@ -96,7 +96,7 @@ fn apply_all_eliminations_and_reset_marks_round_trip() {
 fn stopping_show_me_keeps_the_user_marks() {
     let mut g = game();
     g.select(2);
-    g.notes_mode = true;
+    g.notes = NotesMode::Auto;
     entry(&mut g, 4); // a user removal
     showme::start(&mut g);
     showme::stop(&mut g);

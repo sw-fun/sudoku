@@ -13,6 +13,8 @@ spacebar, Backspace, or Delete.
 
 ![Board in play](docs/images/board-in-play.png)
 
+![User-entered pencil notes](docs/images/notes-user.png)
+
 ![Customize dialog](docs/images/customize-dialog.png)
 
 ![Abandon confirmation](docs/images/abandon-dialog.png)

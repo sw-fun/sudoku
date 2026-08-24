@@ -8,6 +8,7 @@ license.workspace = true
 [dependencies]
 suduko-grid = { path = "../../../engine/crates/suduko-grid" }
 suduko-tutor = { path = "../../../tutor/crates/suduko-tutor" }
+suduko-uikit = { path = "../../../uikit/crates/suduko-uikit" }
 
 [lints]
 workspace = true

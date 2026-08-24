@@ -56,10 +56,10 @@ fn corrupt_codes_fail_closed_to_none() {
     let good = save(1, Some(&game()), &stats());
     for bad in [
         String::new(),
-        good.replace("v1|", "v9|"),
-        good.replace('1', "x"),             // bad digit charset
-        good[..good.len() - 5].to_string(), // truncated tail
-        String::from("v1|9|1|1|1|0|0|"),    // level out of range
+        good.replace("v2|", "v9|"),
+        good.replace('1', "x"),                // bad digit charset
+        good[..good.len() - 5].to_string(),    // truncated tail
+        String::from("v2|9|1|1|1|0|0|0||0=0"), // level out of range
     ] {
         assert!(
             restore(&bad).is_none(),

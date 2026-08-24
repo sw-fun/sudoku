@@ -50,7 +50,8 @@ pub fn from_puzzle(puzzle: &Puzzle) -> Game {
         show_me_delay_ticks: 0,
         show_me_wait: 0,
         eliminated: Vec::new(),
-        notes_mode: false,
+        notes: suduko_uikit::NotesMode::Off,
+        user_marks: [0; CELL_COUNT],
         keypad_open: false,
     }
 }
@@ -69,9 +70,12 @@ fn parse(text: &str) -> Option<Board> {
     suduko_grid::parse(text).ok()
 }
 
-/// Encodes the save slot: `v1|level|clues|solution|user|elapsed|bad|stats`
-/// where the three boards are 81-char digit strings (0 = empty) and
-/// stats is `idx=count;...`. `game = None` writes empty boards.
+/// Encodes the save slot:
+/// `v2|level|clues|solution|user|elapsed|bad|notes|marks|stats`
+/// where the three boards are 81-char digit strings (0 = empty),
+/// notes is 0/1/2 (off/user/auto), marks is `idx=hexmask;` pairs for
+/// non-empty user marks, and stats is `idx=count;...`. `game = None`
+/// writes empty boards with notes off.
 pub fn save(level: u8, game: Option<&Game>, stats: &BTreeMap<u8, u32>) -> String {
     let enc = |b: &[u8; CELL_COUNT]| -> String { b.iter().map(|&d| (b'0' + d) as char).collect() };
     let (clues, solution, user, elapsed, bad) = game.map_or(
@@ -92,27 +96,38 @@ pub fn save(level: u8, game: Option<&Game>, stats: &BTreeMap<u8, u32>) -> String
             )
         },
     );
+    let (notes, marks) = game.map_or((0u8, String::new()), |g| {
+        let marks = g
+            .user_marks
+            .iter()
+            .enumerate()
+            .filter(|&(_, &m)| m != 0)
+            .map(|(i, &m)| format!("{i}={m:x};"))
+            .collect::<String>();
+        (g.notes as u8, marks)
+    });
     let stats_text = stats
         .iter()
         .map(|(l, n)| format!("{l}={n}"))
         .collect::<Vec<_>>()
         .join(";");
-    format!("v1|{level}|{clues}|{solution}|{user}|{elapsed}|{bad}|{stats_text}")
+    format!("v2|{level}|{clues}|{solution}|{user}|{elapsed}|{bad}|{notes}|{marks}|{stats_text}")
 }
 
 /// Decodes a save slot written by [`save`]; anything malformed (bad
 /// version, wrong field count, bad lengths or charset, level index
-/// out of range) fails closed to `None`. A board already fully and
+/// out of range) fails closed to `None`. v1 slots (no notes fields)
+/// restore with notes off and empty marks. A board already fully and
 /// correctly solved restores without a game.
 pub fn restore(text: &str) -> Option<Save> {
     let parts: Vec<&str> = text.split('|').collect();
-    if parts.len() != 8 || parts[0] != "v1" {
+    let v2 = parts.len() == 10 && parts[0] == "v2";
+    let v1 = parts.len() == 8 && parts[0] == "v1";
+    if !v1 && !v2 {
         return None;
     }
     let level = parts[1].parse::<u8>().ok()?;
-    if level > 4 {
-        return None;
-    }
+    (level <= 4).then_some(())?;
     let cells = |t: &str| -> Option<[u8; CELL_COUNT]> {
         let b = t.as_bytes();
         (b.len() == CELL_COUNT && b.iter().all(u8::is_ascii_digit)).then(|| {
@@ -126,25 +141,40 @@ pub fn restore(text: &str) -> Option<Save> {
     let boards = [cells(parts[2])?, cells(parts[3])?, cells(parts[4])?];
     let elapsed = parts[5].parse::<u32>().ok()?;
     let bad = parts[6].parse::<u32>().ok()?;
-    let mut stats = BTreeMap::new();
-    if !parts[7].is_empty() {
-        for pair in parts[7].split(';') {
-            let (l, n) = pair.split_once('=')?;
-            let (l, n) = (l.parse::<u8>().ok()?, n.parse::<u32>().ok()?);
-            if l > 4 {
-                return None;
-            }
-            stats.insert(l, n);
+    let (notes, mut marks) = (suduko_uikit::NotesMode::Off, [0u16; CELL_COUNT]);
+    let (notes, marks) = if v2 {
+        let notes = suduko_uikit::NotesMode::from_index(parts[7].parse().ok()?)?;
+        for p in parts[8].split(';').filter(|p| !p.is_empty()) {
+            let (i, m) = p.split_once('=')?;
+            *marks.get_mut(i.parse::<usize>().ok()?)? = u16::from_str_radix(m, 16).ok()? & 0x1ff;
         }
+        (notes, marks)
+    } else {
+        (notes, marks)
+    };
+    let mut stats = BTreeMap::new();
+    for pair in parts[if v2 { 9 } else { 7 }]
+        .split(';')
+        .filter(|p| !p.is_empty())
+    {
+        let (l, n) = pair.split_once('=')?;
+        stats.insert(l.parse::<u8>().ok()?, n.parse::<u32>().ok()?);
     }
+    (!stats.keys().any(|&l| l > 4)).then_some(())?;
     let has_game = boards[1].iter().any(|&d| d != 0);
     let solved = (0..CELL_COUNT).all(|i| boards[1][i] != 0 && boards[2][i] == boards[1][i]);
-    let game = (has_game && !solved).then(|| restored_game(&boards, elapsed, bad));
+    let game = (has_game && !solved).then(|| restored_game(&boards, elapsed, bad, notes, marks));
     Some(Save { level, stats, game })
 }
 
 /// Rebuilds a fresh-but-populated game from decoded save fields.
-fn restored_game(boards: &[[u8; CELL_COUNT]; 3], elapsed: u32, bad: u32) -> Game {
+fn restored_game(
+    boards: &[[u8; CELL_COUNT]; 3],
+    elapsed: u32,
+    bad: u32,
+    notes: suduko_uikit::NotesMode,
+    marks: [u16; CELL_COUNT],
+) -> Game {
     Game {
         clues: boards[0],
         solution: boards[1],
@@ -159,7 +189,8 @@ fn restored_game(boards: &[[u8; CELL_COUNT]; 3], elapsed: u32, bad: u32) -> Game
         show_me_delay_ticks: 0,
         show_me_wait: 0,
         eliminated: Vec::new(),
-        notes_mode: false,
+        notes,
+        user_marks: marks,
         keypad_open: false,
     }
 }

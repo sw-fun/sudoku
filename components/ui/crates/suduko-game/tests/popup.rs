@@ -1,4 +1,6 @@
-use suduko_game::{Game, clear_selected, entry, from_strings, keypad_visible, set_value};
+use suduko_game::{
+    Game, NotesMode, clear_selected, entry, from_strings, keypad_visible, set_value,
+};
 
 /// Wikipedia easy puzzle (singles-solvable) and its solution.
 const CLUES: &str =
@@ -29,9 +31,9 @@ fn keypad_stays_hidden_for_givens_notes_showme_and_won() {
     g.select(0); // r0c0 is a clue
     assert!(!keypad_visible(&g), "given cells never open the keypad");
     g.select(2);
-    g.notes_mode = true;
+    g.notes = NotesMode::Auto;
     assert!(!keypad_visible(&g), "notes mode hides the keypad");
-    g.notes_mode = false;
+    g.notes = NotesMode::Off;
     g.show_me = true;
     assert!(!keypad_visible(&g), "show-me hides the keypad");
     g.show_me = false;
@@ -49,9 +51,9 @@ fn placing_or_erasing_closes_the_keypad() {
     clear_selected(&mut g);
     assert!(!keypad_visible(&g), "erase closes the keypad");
     g.select(2);
-    g.notes_mode = true;
+    g.notes = NotesMode::Auto;
     entry(&mut g, 5);
-    g.notes_mode = false;
+    g.notes = NotesMode::Off;
     assert!(
         keypad_visible(&g),
         "notes-mode typing never touched the popup state"

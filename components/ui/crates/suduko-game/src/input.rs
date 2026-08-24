@@ -40,47 +40,74 @@ pub fn erase(game: &mut Game, idx: usize) {
     }
 }
 
-/// Enters `digit` into the selected cell, if one is selected. In
-/// notes mode the digit toggles a pencil-mark candidate instead of
-/// placing (empty cells only; computed candidates are never restored
-/// beyond what the rules allow). A placement closes the cell keypad.
+/// Enters `digit` into the selected cell, if one is selected, per the
+/// notes mode: `User` toggles a player mark (empty cells, legal
+/// digits only), `Auto` strikes a computed candidate, `Off` places a
+/// value and closes the cell keypad.
 pub fn entry(game: &mut Game, digit: u8) {
+    use suduko_uikit::NotesMode;
     let Some(&sel) = game.selected.as_ref() else {
         return;
     };
-    if game.notes_mode {
-        if game.shown(sel) != 0 {
-            return;
+    match game.notes {
+        NotesMode::User => {
+            if game.shown(sel) != 0 {
+                return;
+            }
+            let base = suduko_tutor::candidates_with(&game.shown_values(), &[]);
+            if base.masks[sel] & (1 << (digit - 1)) != 0 {
+                game.user_marks[sel] ^= 1 << (digit - 1);
+            }
         }
-        let base = suduko_tutor::candidates_with(&game.shown_values(), &[]);
-        if base.masks[sel] & (1 << (digit - 1)) == 0 {
-            return;
+        NotesMode::Auto => {
+            if game.shown(sel) != 0 {
+                return;
+            }
+            let base = suduko_tutor::candidates_with(&game.shown_values(), &[]);
+            if base.masks[sel] & (1 << (digit - 1)) != 0 {
+                let e = (sel, digit);
+                if game.eliminated.contains(&e) {
+                    game.eliminated.retain(|&x| x != e);
+                } else {
+                    game.eliminated.push(e);
+                }
+            }
         }
-        let entry = (sel, digit);
-        if game.eliminated.contains(&entry) {
-            game.eliminated.retain(|&e| e != entry);
-        } else {
-            game.eliminated.push(entry);
+        NotesMode::Off => {
+            set_value(game, sel, digit);
+            game.keypad_open = false;
         }
-        return;
     }
-    set_value(game, sel, digit);
-    game.keypad_open = false;
 }
 
-/// Erases the selected cell, if one is selected. In notes mode it
-/// restores the selected cell's computed candidates instead. Erasing
-/// closes the cell keypad.
+/// Erases the selected cell, if one is selected: `User` clears the
+/// cell's player marks, `Auto` restores its computed candidates,
+/// `Off` clears the value. Erasing closes the cell keypad.
 pub fn clear_selected(game: &mut Game) {
+    use suduko_uikit::NotesMode;
     let Some(&sel) = game.selected.as_ref() else {
         return;
     };
-    if game.notes_mode {
-        game.eliminated.retain(|&(i, _)| i != sel);
-        return;
+    match game.notes {
+        NotesMode::User => game.user_marks[sel] = 0,
+        NotesMode::Auto => game.eliminated.retain(|&(i, _)| i != sel),
+        NotesMode::Off => {
+            erase(game, sel);
+            game.keypad_open = false;
+        }
     }
-    erase(game, sel);
-    game.keypad_open = false;
+}
+
+impl Game {
+    /// User-entered marks for each cell, as sorted digits.
+    #[must_use]
+    pub fn user_marks_view(&self) -> [Vec<u8>; CELL_COUNT] {
+        core::array::from_fn(|idx| {
+            (1..=9u8)
+                .filter(|d| self.user_marks[idx] & (1 << (d - 1)) != 0)
+                .collect()
+        })
+    }
 }
 
 /// True when the cell keypad should render: explicitly open, a
@@ -89,7 +116,7 @@ pub fn clear_selected(game: &mut Game) {
 pub fn keypad_visible(game: &Game) -> bool {
     game.keypad_open
         && game.selected.is_some_and(|sel| !game.is_given(sel))
-        && !game.notes_mode
+        && game.notes == suduko_uikit::NotesMode::Off
         && !game.show_me
         && !game.won
 }
@@ -104,11 +131,7 @@ pub fn highlight_set(game: &Game) -> Vec<usize> {
     if game.shown(sel) == 0 {
         return peers_of(sel).to_vec();
     }
-    same_value_cells(game, sel, game.shown(sel))
-}
-
-fn same_value_cells(game: &Game, sel: usize, value: u8) -> Vec<usize> {
     (0..CELL_COUNT)
-        .filter(|&idx| idx != sel && game.shown(idx) == value && !game.is_wrong(idx))
+        .filter(|&idx| idx != sel && game.shown(idx) == game.shown(sel) && !game.is_wrong(idx))
         .collect()
 }

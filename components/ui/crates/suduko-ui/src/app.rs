@@ -137,7 +137,7 @@ impl Component for Model {
             Msg::ShowMeToggle => self.mut_game(suduko_game::showme::toggle),
             Msg::ShowMeAuto(on) => self.mut_game(|g| g.show_me_auto = on),
             Msg::ShowMeDelay(t) => self.mut_game(|g| g.show_me_delay_ticks = t),
-            Msg::NotesToggle => self.mut_game(|g| g.notes_mode = !g.notes_mode),
+            Msg::NotesToggle => self.mut_game(|g| g.notes = g.notes.next()),
             Msg::NoteApply => self.mut_game(|g| note(g, NoteOp::ApplyCurrent)),
             Msg::NoteApplyAll => self.mut_game(|g| note(g, NoteOp::ApplyAll)),
             Msg::NoteReset => self.mut_game(|g| note(g, NoteOp::Reset)),

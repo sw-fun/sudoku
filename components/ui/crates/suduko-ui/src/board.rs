@@ -6,7 +6,7 @@ use crate::app::{Model, Msg};
 use crate::learn::{marks_html, step_classes};
 use suduko_engine::Level;
 use suduko_game::{Game, StepView, digit_complete, highlight_set, keypad_visible};
-use suduko_uikit::{CellInput, InputMode, anchor_style, mmss};
+use suduko_uikit::{CellInput, InputMode, NotesMode, anchor_style, mmss};
 use yew::html::Scope;
 use yew::prelude::*;
 
@@ -59,8 +59,7 @@ fn cell(
 pub fn view_board(game: &Game, level: Level, mode: InputMode, link: &Scope<Model>) -> Html {
     let highlights = highlight_set(game);
     let teaching = game.teaching.panel_open;
-    let show_marks = teaching || game.notes_mode;
-    let notes = game.notes_mode;
+    let notes_on = game.notes != NotesMode::Off;
     html! {
         <main class="game" data-testid="game">
             <header class="game-header">
@@ -75,10 +74,10 @@ pub fn view_board(game: &Game, level: Level, mode: InputMode, link: &Scope<Model
                         { if game.show_me { "Stop show-me" } else { "Show me" } }
                     </button>
                     <button
-                        class={ if notes { "menu-btn notes-btn on" } else { "menu-btn notes-btn" } }
+                        class={ if notes_on { "menu-btn notes-btn on" } else { "menu-btn notes-btn" } }
                         data-testid="notes-btn"
                         onclick={ link.callback(|_| Msg::NotesToggle) }>
-                        { if notes { "Notes on" } else { "Notes" } }
+                        { game.notes.label() }
                     </button>
                     <button class="menu-btn help-btn" data-testid="help-btn" onclick={ link.callback(|_| Msg::HelpToggle) }>
                         { "?" }
@@ -91,7 +90,7 @@ pub fn view_board(game: &Game, level: Level, mode: InputMode, link: &Scope<Model
                 </div>
             </header>
             { if mode == InputMode::Above { pad(game, link) } else { html! {} } }
-            { grid(game, &highlights, show_marks, mode, link) }
+            { grid(game, &highlights, mode, link) }
             { if mode == InputMode::Below { pad(game, link) } else { html! {} } }
             { if teaching {
                 crate::learn::learn_panel(game, &link.callback(|_| Msg::LearnToggle), &link.callback(Msg::LearnSelect), &link.callback(|d: isize| Msg::LearnStep(d)), &link.callback(Msg::ShowMeAuto), &link.callback(Msg::ShowMeDelay), &link.callback(|_| Msg::NoteApply), &link.callback(|_| Msg::NoteApplyAll), &link.callback(|_| Msg::NoteReset))
@@ -106,20 +105,15 @@ pub fn view_board(game: &Game, level: Level, mode: InputMode, link: &Scope<Model
     }
 }
 
-fn grid(
-    game: &Game,
-    highlights: &[usize],
-    show_marks: bool,
-    mode: InputMode,
-    link: &Scope<Model>,
-) -> Html {
+fn grid(game: &Game, highlights: &[usize], mode: InputMode, link: &Scope<Model>) -> Html {
     let on_select = link.callback(Msg::Select);
     let on_digit = link.callback(Msg::Digit);
     let on_erase = link.callback(|_| Msg::Erase);
-    let marks = if show_marks {
-        Some(game.pencil_marks())
-    } else {
-        None
+    let marks = match (game.teaching.panel_open, game.notes) {
+        (false, NotesMode::Off) => None,
+        (false, NotesMode::User) => Some(game.user_marks_view()),
+        (true, _) => Some(game.pencil_marks()),
+        (_, NotesMode::Auto) => Some(game.pencil_marks()),
     };
     let view = game.step_view();
     let cells = (0..81).map(|idx| {

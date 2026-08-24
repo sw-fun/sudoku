@@ -4,7 +4,7 @@ version = 4
 
 [[package]]
 name = "suduko-engine"
-version = "0.6.1"
+version = "0.6.2"
 dependencies = [
  "suduko-generator",
  "suduko-grader",
@@ -15,7 +15,7 @@ dependencies = [
 
 [[package]]
 name = "suduko-generator"
-version = "0.6.1"
+version = "0.6.2"
 dependencies = [
  "suduko-grid",
  "suduko-solver",
@@ -23,7 +23,7 @@ dependencies = [
 
 [[package]]
 name = "suduko-grader"
-version = "0.6.1"
+version = "0.6.2"
 dependencies = [
  "suduko-grid",
  "suduko-solver",
@@ -33,25 +33,25 @@ dependencies = [
 
 [[package]]
 name = "suduko-grid"
-version = "0.6.1"
+version = "0.6.2"
 
 [[package]]
 name = "suduko-solver"
-version = "0.6.1"
+version = "0.6.2"
 dependencies = [
  "suduko-grid",
 ]
 
 [[package]]
 name = "suduko-techniques"
-version = "0.6.1"
+version = "0.6.2"
 dependencies = [
  "suduko-grid",
 ]
 
 [[package]]
 name = "suduko-techniques-advanced"
-version = "0.6.1"
+version = "0.6.2"
 dependencies = [
  "suduko-grid",
  "suduko-techniques",
