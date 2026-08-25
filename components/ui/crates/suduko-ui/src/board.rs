@@ -6,7 +6,7 @@ use crate::app::{Model, Msg};
 use crate::learn::{marks_html, step_classes};
 use suduko_engine::Level;
 use suduko_game::{Game, StepView, digit_complete, highlight_set, keypad_visible};
-use suduko_uikit::{CellInput, InputMode, NotesMode, anchor_style, mmss};
+use suduko_uikit::{CellInput, InputMode, anchor_style, mmss};
 use yew::html::Scope;
 use yew::prelude::*;
 
@@ -56,41 +56,21 @@ fn cell(
 }
 
 #[allow(clippy::too_many_arguments)]
-pub fn view_board(game: &Game, level: Level, mode: InputMode, link: &Scope<Model>) -> Html {
+pub fn view_board(
+    game: &Game,
+    level: Level,
+    mode: InputMode,
+    notes_visible: bool,
+    link: &Scope<Model>,
+) -> Html {
     let highlights = highlight_set(game);
     let teaching = game.teaching.panel_open;
-    let notes_on = game.notes != NotesMode::Off;
+    let pencil = game.pencil;
     html! {
         <main class="game" data-testid="game">
-            <header class="game-header">
-                <div class="header-btns">
-                    <button class="menu-btn" data-testid="menu-btn" onclick={ link.callback(|_| Msg::Menu) }>
-                        { "Menu" }
-                    </button>
-                    <button class="menu-btn learn-btn" data-testid="learn-btn" onclick={ link.callback(|_| Msg::LearnToggle) }>
-                        { if teaching { "Hide learning" } else { "Learn" } }
-                    </button>
-                    <button class="menu-btn showme-btn" data-testid="showme-btn" onclick={ link.callback(|_| Msg::ShowMeToggle) }>
-                        { if game.show_me { "Stop show-me" } else { "Show me" } }
-                    </button>
-                    <button
-                        class={ if notes_on { "menu-btn notes-btn on" } else { "menu-btn notes-btn" } }
-                        data-testid="notes-btn"
-                        onclick={ link.callback(|_| Msg::NotesToggle) }>
-                        { game.notes.label() }
-                    </button>
-                    <button class="menu-btn help-btn" data-testid="help-btn" onclick={ link.callback(|_| Msg::HelpToggle) }>
-                        { "?" }
-                    </button>
-                </div>
-                <div class="header-stats">
-                    <span class="level" data-testid="level">{ level.label() }</span>
-                    <span class="timer" data-testid="timer">{ mmss(game.elapsed_secs) }</span>
-                    <span class="bad" data-testid="bad-count">{ format!("bad: {}", game.bad_inputs) }</span>
-                </div>
-            </header>
+            { header_view(game, level, pencil, link) }
             { if mode == InputMode::Above { pad(game, link) } else { html! {} } }
-            { grid(game, &highlights, mode, link) }
+            { grid(game, &highlights, mode, notes_visible, link) }
             { if mode == InputMode::Below { pad(game, link) } else { html! {} } }
             { if teaching {
                 crate::learn::learn_panel(game, &link.callback(|_| Msg::LearnToggle), &link.callback(Msg::LearnSelect), &link.callback(|d: isize| Msg::LearnStep(d)), &link.callback(Msg::ShowMeAuto), &link.callback(Msg::ShowMeDelay), &link.callback(|_| Msg::NoteApply), &link.callback(|_| Msg::NoteApplyAll), &link.callback(|_| Msg::NoteReset))
@@ -105,15 +85,56 @@ pub fn view_board(game: &Game, level: Level, mode: InputMode, link: &Scope<Model
     }
 }
 
-fn grid(game: &Game, highlights: &[usize], mode: InputMode, link: &Scope<Model>) -> Html {
+/// Game header: menu/learn/showme/notes/help buttons and stats.
+fn header_view(game: &Game, level: Level, pencil: bool, link: &Scope<Model>) -> Html {
+    let teaching = game.teaching.panel_open;
+    html! {
+        <header class="game-header">
+            <div class="header-btns">
+                <button class="menu-btn" data-testid="menu-btn" onclick={ link.callback(|_| Msg::Menu) }>
+                    { "Menu" }
+                </button>
+                <button class="menu-btn learn-btn" data-testid="learn-btn" onclick={ link.callback(|_| Msg::LearnToggle) }>
+                    { if teaching { "Hide learning" } else { "Learn" } }
+                </button>
+                <button class="menu-btn showme-btn" data-testid="showme-btn" onclick={ link.callback(|_| Msg::ShowMeToggle) }>
+                    { if game.show_me { "Stop show-me" } else { "Show me" } }
+                </button>
+                <button
+                    class={ if pencil { "menu-btn notes-btn on" } else { "menu-btn notes-btn" } }
+                    data-testid="notes-btn"
+                    onclick={ link.callback(|_| Msg::NotesToggle) }>
+                    { if pencil { "Notes: on" } else { "Notes: off" } }
+                </button>
+                <button class="menu-btn help-btn" data-testid="help-btn" onclick={ link.callback(|_| Msg::HelpToggle) }>
+                    { "?" }
+                </button>
+            </div>
+            <div class="header-stats">
+                <span class="level" data-testid="level">{ level.label() }</span>
+                <span class="timer" data-testid="timer">{ mmss(game.elapsed_secs) }</span>
+                <span class="bad" data-testid="bad-count">{ format!("bad: {}", game.bad_inputs) }</span>
+            </div>
+        </header>
+    }
+}
+
+fn grid(
+    game: &Game,
+    highlights: &[usize],
+    mode: InputMode,
+    notes_visible: bool,
+    link: &Scope<Model>,
+) -> Html {
     let on_select = link.callback(Msg::Select);
     let on_digit = link.callback(Msg::Digit);
     let on_erase = link.callback(|_| Msg::Erase);
-    let marks = match (game.teaching.panel_open, game.notes) {
-        (false, NotesMode::Off) => None,
-        (false, NotesMode::User) => Some(game.user_marks_view()),
-        (true, _) => Some(game.pencil_marks()),
-        (_, NotesMode::Auto) => Some(game.pencil_marks()),
+    let marks = if game.teaching.panel_open {
+        Some(game.pencil_marks())
+    } else if notes_visible {
+        Some(game.user_marks_view())
+    } else {
+        None
     };
     let view = game.step_view();
     let cells = (0..81).map(|idx| {

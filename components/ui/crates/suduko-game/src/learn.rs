@@ -118,10 +118,14 @@ impl Game {
     }
 }
 
-/// Pencil-note operations on the removal layer.
+/// Pencil-note operations on the removal and user layers.
 pub enum NoteOp {
     /// Append strategy removals to the layer.
     Extend(Vec<(usize, u8)>),
+    /// Fill every empty cell's user notes with computed candidates.
+    FillUser,
+    /// Wipe the whole user-notes layer.
+    ClearUser,
     /// Apply the selected walkthrough annotation's eliminations.
     ApplyCurrent,
     /// Apply every offered elimination strategy at once.
@@ -133,6 +137,15 @@ pub enum NoteOp {
 /// One note-layer action; see `NoteOp`.
 pub fn note(game: &mut Game, op: NoteOp) {
     match op {
+        NoteOp::FillUser => {
+            let cands = suduko_tutor::candidates_with(&game.shown_values(), &[]);
+            for idx in 0..suduko_grid::CELL_COUNT {
+                if !cands.placed[idx] {
+                    game.user_marks[idx] = cands.masks[idx] & 0x1ff;
+                }
+            }
+        }
+        NoteOp::ClearUser => game.user_marks = [0; suduko_grid::CELL_COUNT],
         NoteOp::Extend(removals) => {
             game.eliminated.extend(removals);
             game.eliminated.sort_unstable();

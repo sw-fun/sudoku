@@ -1,5 +1,6 @@
 use suduko_game::{
-    Game, NotesMode, clear_selected, entry, from_strings, keypad_visible, restore, save, set_value,
+    Game, NoteOp, clear_selected, entry, from_strings, keypad_visible, note, restore, save,
+    set_value,
 };
 
 /// Wikipedia easy puzzle (singles-solvable) and its solution.
@@ -13,34 +14,34 @@ fn game() -> Game {
 }
 
 #[test]
-fn fresh_games_start_with_notes_off_and_empty_user_marks() {
+fn fresh_games_start_in_value_mode_with_empty_notes() {
     let g = game();
-    assert_eq!(g.notes, NotesMode::Off);
+    assert!(!g.pencil);
     assert!(g.user_marks.iter().all(|&m| m == 0));
 }
 
 #[test]
-fn user_mode_digit_presses_toggle_marks_starting_empty() {
+fn pencil_on_digit_presses_toggle_notes_and_never_place() {
     let mut g = game();
-    g.notes = NotesMode::User;
+    g.pencil = true;
     g.select(8); // r0c8, candidates are exactly 2 and 8
     entry(&mut g, 2);
-    assert_eq!(g.user_marks[8], 1 << 1, "first press writes the mark");
+    assert_eq!(g.user_marks[8], 1 << 1, "first press writes the note");
     entry(&mut g, 8);
     assert_eq!(g.user_marks[8], (1 << 1) | (1 << 7), "second digit adds");
     entry(&mut g, 2);
     assert_eq!(g.user_marks[8], 1 << 7, "repeat press removes");
-    assert_eq!(g.shown(2), 0, "user mode never places values");
+    assert_eq!(g.shown(8), 0, "pencil mode never places values");
     assert_eq!(g.bad_inputs, 0, "and never counts bad inputs");
 }
 
 #[test]
-fn user_mode_marks_only_land_in_empty_cells_and_legal_digits() {
+fn pencil_notes_only_land_in_empty_cells_and_legal_digits() {
     let mut g = game();
-    g.notes = NotesMode::User;
+    g.pencil = true;
     g.select(0); // r0c0 is a clue
-    entry(&mut g, 4);
-    assert_eq!(g.user_marks[0], 0, "clue cells never take marks");
+    entry(&mut g, 2);
+    assert_eq!(g.user_marks[0], 0, "clue cells never take notes");
     g.select(8);
     entry(&mut g, 5); // 5 already in r0 (peer)
     assert_eq!(
@@ -51,81 +52,123 @@ fn user_mode_marks_only_land_in_empty_cells_and_legal_digits() {
 }
 
 #[test]
-fn user_mode_erase_clears_the_cells_marks() {
+fn pencil_erase_clears_the_cells_notes_value_erase_clears_the_value() {
     let mut g = game();
-    g.notes = NotesMode::User;
+    g.pencil = true;
     g.select(8);
     entry(&mut g, 2);
-    entry(&mut g, 8);
     clear_selected(&mut g);
-    assert_eq!(g.user_marks[8], 0, "erase wipes the cell's user marks");
+    assert_eq!(g.user_marks[8], 0, "pencil erase wipes the cell's notes");
+    g.pencil = false;
+    set_value(&mut g, 8, 2);
+    clear_selected(&mut g);
+    assert_eq!(g.shown(8), 0, "value erase clears the value");
 }
 
 #[test]
-fn auto_mode_keeps_computed_candidate_strike_outs() {
+fn placing_a_value_prunes_that_digits_notes_from_all_peers() {
+    use suduko_grid::peers_of;
     let mut g = game();
-    g.notes = NotesMode::Auto;
-    g.select(2);
-    let computed = g.pencil_marks()[2].clone();
-    assert!(!computed.is_empty(), "auto shows computed candidates");
-    entry(&mut g, computed[0]);
-    let after = g.pencil_marks()[2].clone();
-    assert!(
-        !after.contains(&computed[0]),
-        "striking a computed candidate removes it"
-    );
-    entry(&mut g, computed[0]);
-    assert!(
-        g.pencil_marks()[2].contains(&computed[0]),
-        "repeat press restores it"
-    );
+    let peers: Vec<usize> = peers_of(2).to_vec();
+    // pencil 9 into every cell where it is legal (dynamically verified)
+    g.pencil = true;
+    let mut nonpeer_targets = 0;
+    for cell in 0..81usize {
+        g.select(cell);
+        entry(&mut g, 9);
+        if !peers.contains(&cell) && g.user_marks[cell] & (1 << 8) != 0 {
+            nonpeer_targets += 1;
+        }
+    }
+    assert!(nonpeer_targets > 0, "some non-peer holds a 9 note");
+    g.pencil = false;
+    // place 9 at r0c2 (empty player cell, solution 4): peers lose the 9 note
+    let out = set_value(&mut g, 2, 9);
+    assert!(out.wrong, "9 is wrong at r0c2 (solution 4)");
+    for &p in &peers {
+        assert_eq!(g.user_marks[p] & (1 << 8), 0, "peer {p} lost its 9 note");
+    }
+    let kept = (0..81)
+        .filter(|&c| !peers.contains(&c) && g.user_marks[c] & (1 << 8) != 0)
+        .count();
+    assert_eq!(kept, nonpeer_targets, "every non-peer keeps its 9 note");
 }
 
 #[test]
-fn user_marks_render_view_round_trips_the_bitmask() {
+fn user_marks_view_lists_sorted_digits() {
     let mut g = game();
-    g.notes = NotesMode::User;
+    g.pencil = true;
     g.select(8);
-    entry(&mut g, 2);
     entry(&mut g, 8);
+    entry(&mut g, 2);
     assert_eq!(g.user_marks_view()[8], vec![2, 8]);
 }
 
 #[test]
-fn keypad_only_opens_when_notes_are_off() {
+fn keypad_only_opens_in_value_mode() {
     let mut g = game();
     g.select(2);
-    assert!(keypad_visible(&g), "off: popup keypad available");
-    g.notes = NotesMode::User;
-    assert!(!keypad_visible(&g), "user notes hide the keypad");
-    g.notes = NotesMode::Auto;
-    assert!(!keypad_visible(&g), "auto notes hide the keypad");
+    assert!(keypad_visible(&g), "value mode: popup keypad available");
+    g.pencil = true;
+    assert!(!keypad_visible(&g), "pencil mode hides the keypad");
 }
 
 #[test]
-fn user_marks_and_mode_survive_the_save_slot() {
+fn fill_and_clear_notes_actions_manage_the_whole_layer() {
     let mut g = game();
-    g.notes = NotesMode::User;
+    note(&mut g, NoteOp::FillUser);
+    let empty_cells = (0..81).filter(|&i| g.shown(i) == 0).count();
+    let filled = g.user_marks.iter().filter(|&&m| m != 0).count();
+    assert_eq!(empty_cells, filled, "every empty cell gains its candidates");
+    assert!(
+        g.shown(8) == 0 && g.user_marks[8] != 0,
+        "empty cell carries marks"
+    );
+    assert_eq!(g.user_marks[0], 0, "clue cells stay unmarked");
+    note(&mut g, NoteOp::ClearUser);
+    assert!(
+        g.user_marks.iter().all(|&m| m == 0),
+        "clear wipes all notes"
+    );
+}
+
+#[test]
+fn v3_saves_carry_pencil_and_marks() {
+    let mut g = game();
+    g.pencil = true;
     g.select(8);
     entry(&mut g, 2);
     set_value(&mut g, 5, 3);
     let code = save(0, Some(&g), &[(0u8, 7u32)].into_iter().collect());
-    let back = restore(&code).expect("v2 restores");
+    let back = restore(&code).expect("v3 restores");
     let rg = back.game.expect("game saved");
-    assert_eq!(rg.notes, NotesMode::User);
+    assert!(rg.pencil, "pencil state rides along");
     assert_eq!(rg.user_marks[8], 1 << 1);
     assert_eq!(rg.user[5], 3, "placed values ride along");
-    assert_eq!(back.stats[&0], 7);
 }
 
 #[test]
-fn v1_saves_restore_with_notes_off_and_empty_marks() {
+fn v2_saves_map_user_and_auto_notes_forward() {
     let clues = "530070000600195000098000060800060003400803001700020006060000280000419005000080079";
     let zeros = "0".repeat(81);
-    let v1 = format!("v1|0|{clues}|{SOLUTION}|{zeros}|42|1|0=2");
-    let back = restore(&v1).expect("v1 back-compatible");
-    let rg = back.game.expect("v1 game restores");
-    assert_eq!(rg.notes, NotesMode::Off);
-    assert!(rg.user_marks.iter().all(|&m| m == 0));
-    assert_eq!(back.stats[&0], 2);
+    // v2 notes=1 (User) with a mark at cell 8 -> pencil on, mark kept
+    let user = format!("v2|0|{clues}|{SOLUTION}|{zeros}|42|1|1|8=2;|0=2");
+    let back = restore(&user).expect("v2 user restores");
+    let rg = back.game.expect("game");
+    assert!(rg.pencil);
+    assert_eq!(rg.user_marks[8], 1 << 1);
+    // v2 notes=2 (Auto) -> pencil off, computed candidates filled in
+    let auto = format!("v2|0|{clues}|{SOLUTION}|{zeros}|42|1|2||0=2");
+    let back = restore(&auto).expect("v2 auto restores");
+    let rg = back.game.expect("game");
+    assert!(!rg.pencil);
+    let expected = {
+        let vals = core::array::from_fn(|i: usize| clues.as_bytes()[i] - b'0');
+        suduko_tutor::candidates_with(&vals, &[]).masks[8] & 0x1ff
+    };
+    assert_eq!(
+        u32::from(rg.user_marks[8]),
+        u32::from(expected),
+        "auto fills exactly the computed candidates at r0c8"
+    );
 }

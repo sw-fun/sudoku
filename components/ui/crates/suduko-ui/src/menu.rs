@@ -85,7 +85,7 @@ pub(crate) fn start_game(level: Level, seed: u64) -> Game {
 
 /// The customize dialog: choose where the digit input lives and clear
 /// the saved stats. Clicking outside or the X (or Escape) closes it.
-pub fn customize_popup(mode: InputMode, link: &Scope<Model>) -> Html {
+pub fn customize_popup(mode: InputMode, notes_visible: bool, link: &Scope<Model>) -> Html {
     let on_mode = link.callback(Msg::InputModeSet);
     let on_clear_stats = link.callback(|_| Msg::ClearStats);
     let on_close = link.callback(|_| Msg::CustomizeToggle);
@@ -118,6 +118,7 @@ pub fn customize_popup(mode: InputMode, link: &Scope<Model>) -> Html {
                     { option(InputMode::Below) }
                     { option(InputMode::Popup) }
                 </div>
+                { notes_section(notes_visible, link) }
                 <button class="level-btn danger" data-testid="clear-stats" onclick={ on_clear_stats.reform(|_| ()) }>
                     { "Clear stats" }
                 </button>
@@ -126,81 +127,31 @@ pub fn customize_popup(mode: InputMode, link: &Scope<Model>) -> Html {
     }
 }
 
-/// The abandon-progress confirmation shown when leaving an
-/// unfinished board. Yes discards the board (stats are kept); No,
-/// the X, or clicking outside keeps playing.
-pub fn abandon_dialog(link: &Scope<Model>) -> Html {
-    let on_answer = link.callback(Msg::Abandon);
+/// The notes-management section of the customize dialog: show/hide
+/// the player's notes, fill computed candidates everywhere, or wipe
+/// the whole layer.
+fn notes_section(notes_visible: bool, link: &Scope<Model>) -> Html {
     html! {
-        <div class="overlay" data-testid="abandon-overlay" onclick={ on_answer.reform(|_| false) }>
-            <div class="overlay-card custom-card" onclick={ |e: MouseEvent| e.stop_propagation() }>
-                <button class="close-x" data-testid="abandon-close" onclick={ on_answer.reform(|_| false) }>
-                    { "x" }
+        <>
+            <h2>{ "My notes" }</h2>
+            <label class="auto-label">
+                <input
+                    type="checkbox"
+                    checked={ notes_visible }
+                    onchange={ link.callback(|e: Event| {
+                        let input: web_sys::HtmlInputElement = e.target_unchecked_into();
+                        Msg::NotesShow(input.checked())
+                    }) } />
+                { " Show my notes on the board" }
+            </label>
+            <div class="customize-row">
+                <button class="mode-btn" data-testid="fill-notes" onclick={ link.callback(|_| Msg::NotesFill) }>
+                    { "Fill in all notes" }
                 </button>
-                <h2>{ "Abandon this board?" }</h2>
-                <p class="dialog-hint">{ "Your progress on this board will be lost (stats are kept)." }</p>
-                <div class="customize-row">
-                    <button class="level-btn danger" data-testid="abandon-yes" onclick={ on_answer.reform(|_| true) }>
-                        { "Abandon" }
-                    </button>
-                    <button class="level-btn" data-testid="abandon-no" onclick={ on_answer.reform(|_| false) }>
-                        { "Keep playing" }
-                    </button>
-                </div>
-            </div>
-        </div>
-    }
-}
-
-/// The help dialog rendered above the live board; the game keeps
-/// running underneath. Closing returns to the untouched board.
-pub fn help_overlay(link: &Scope<Model>) -> Html {
-    let on_close = link.callback(|_| Msg::HelpToggle);
-    html! {
-        <div class="overlay help-overlay" data-testid="help-overlay" onclick={ on_close.reform(|_| ()) }>
-            <div
-                class="overlay-card help-card"
-                data-testid="help-card"
-                onclick={ |e: MouseEvent| e.stop_propagation() }>
-                <h2>{ "How to play" }</h2>
-                <ul>
-                    <li>{ "Tap or click a cell to select it." }</li>
-                    <li>{ "Enter a digit: type 1-9 or use the pad below the board." }</li>
-                    <li>{ "Erase: spacebar, Backspace, or Delete - or the Erase pad button." }</li>
-                    <li>{ "Wrong entries turn red and count in the bad counter." }</li>
-                    <li>{ "A pad digit grays out once all nine of it are placed correctly." }</li>
-                </ul>
-                <h2>{ "Pencil marks" }</h2>
-                <ul>
-                    <li>{ "The Notes button cycles three modes: off, Notes: mine, Notes: auto." }</li>
-                    <li>{ "Notes: mine starts empty - type (or tap) a digit in a selected empty cell to pencil in your own candidate; repeat it to remove. Erase clears the cell's marks. Your marks are saved with the game." }</li>
-                    <li>{ "Notes: auto fills every empty cell with the app's computed candidates; typing a digit strikes it out, and Erase restores the cell's computed set." }</li>
-                    <li>{ "In Learn, Apply these removals applies one strategy's eliminations to the marks; the picker's Apply all does every listed elimination at once (placements stay yours to make)." }</li>
-                    <li>{ "Reset marks clears all removals and returns to computed candidates." }</li>
-                </ul>
-                <h2>{ "Learn mode" }</h2>
-                <ul>
-                    <li>{ "Learn lists every strategy available on the current board - singles, pointing/claiming, pairs, X-Wing, XY-Wing." }</li>
-                    <li>{ "Pick one to walk it step by step; pencil marks appear in empty cells while learning." }</li>
-                    <li>{ "Pattern cells show outlined blue, involved rows/columns/blocks tint green, eliminations pulse red with strike-through, placements pulse green." }</li>
-                </ul>
-                <h2>{ "Show me" }</h2>
-                <ul>
-                    <li>{ "Show me has the game solve the board itself, explaining each strategy as it applies it." }</li>
-                    <li>{ "Auto advances at the selected pace (1s/3s/6s); pressing Next pauses Auto for manual stepping." }</li>
-                    <li>{ "When the taught techniques run out, a trial placement is explained and applied so the board still solves to the end." }</li>
-                </ul>
-                <h2>{ "Difficulty" }</h2>
-                <ul>
-                    <li>{ "Easy through Hardest need progressively rarer techniques (measured by the generator's difficulty bands)." }</li>
-                </ul>
-                <button
-                    class="level-btn"
-                    data-testid="help-close"
-                    onclick={ on_close.reform(|_| ()) }>
-                    { "Back to the board" }
+                <button class="mode-btn" data-testid="clear-notes" onclick={ link.callback(|_| Msg::NotesClear) }>
+                    { "Clear all notes" }
                 </button>
             </div>
-        </div>
+        </>
     }
 }

@@ -1,7 +1,7 @@
 //! Pencil-note layer: user-owned candidate removals.
 
 use suduko_game::showme;
-use suduko_game::{Game, NoteOp, NotesMode, clear_selected, entry, from_strings, note};
+use suduko_game::{Game, NoteOp, clear_selected, entry, from_strings, note, set_value};
 
 /// Wikipedia easy clues and its solution.
 const CLUES: &str =
@@ -14,39 +14,44 @@ fn game() -> Game {
 }
 
 #[test]
-fn notes_mode_entry_toggles_a_candidate_and_erase_restores_the_cell() {
+fn pencil_toggles_notes_and_erase_clears_them() {
     let mut g = game();
-    g.select(2); // r1c3, empty; solution 4, computed marks contain 4
-    assert!(g.pencil_marks()[2].contains(&4));
-    g.notes = NotesMode::Auto;
+    g.pencil = true;
+    g.select(2); // r0c3, empty; solution 4, candidates include 4
     entry(&mut g, 4);
-    assert!(
-        !g.pencil_marks()[2].contains(&4),
-        "typing 4 in notes mode removes the 4 mark"
-    );
+    assert_eq!(g.user_marks[2], 1 << 3, "typing 4 pencils it in");
     entry(&mut g, 4);
-    assert!(
-        g.pencil_marks()[2].contains(&4),
-        "typing it again brings the mark back"
-    );
-    entry(&mut g, 2);
-    assert!(!g.pencil_marks()[2].contains(&2));
+    assert_eq!(g.user_marks[2], 0, "typing it again removes it");
+    entry(&mut g, 4);
     clear_selected(&mut g);
-    assert!(
-        g.pencil_marks()[2].contains(&2),
-        "erase in notes mode restores the cell's computed candidates"
-    );
+    assert_eq!(g.user_marks[2], 0, "erase clears the cell's notes");
 }
 
 #[test]
-fn notes_mode_entry_never_places_digits() {
+fn pencil_entry_never_places_digits() {
     let mut g = game();
+    g.pencil = true;
     g.select(2);
-    g.notes = NotesMode::Auto;
     entry(&mut g, 4);
     entry(&mut g, 4); // toggle twice
-    assert_eq!(g.user[2], 0, "notes mode never writes cell values");
+    assert_eq!(g.user[2], 0, "pencil mode never writes cell values");
     assert_eq!(g.bad_inputs, 0);
+}
+
+#[test]
+fn placement_prunes_peer_notes_even_from_pencil_layer() {
+    let mut g = game();
+    g.pencil = true;
+    for &cell in &[2usize, 11, 20] {
+        // r0 peers of the placed cell
+        g.select(cell);
+        entry(&mut g, 9);
+    }
+    g.pencil = false;
+    set_value(&mut g, 5, 9); // any r0 placement prunes r0 notes
+    assert_eq!(g.user_marks[2] & (1 << 8), 0, "peer lost the 9 note");
+    assert_eq!(g.user_marks[11] & (1 << 8), 0);
+    assert_eq!(g.user_marks[20] & (1 << 8), 0);
 }
 
 #[test]
@@ -95,13 +100,14 @@ fn apply_all_eliminations_and_reset_marks_round_trip() {
 #[test]
 fn stopping_show_me_keeps_the_user_marks() {
     let mut g = game();
+    g.pencil = true;
     g.select(2);
-    g.notes = NotesMode::Auto;
-    entry(&mut g, 4); // a user removal
+    entry(&mut g, 4); // a user note
     showme::start(&mut g);
     showme::stop(&mut g);
-    assert!(
-        !g.pencil_marks()[2].contains(&4),
-        "stop no longer wipes the note layer"
+    assert_eq!(
+        g.user_marks[2],
+        1 << 3,
+        "stop no longer wipes the user notes"
     );
 }

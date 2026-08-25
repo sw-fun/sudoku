@@ -3,15 +3,15 @@
 //! dialogs live in `menu`; keyboard wiring in `keys`.
 
 use crate::board::view_board;
+use crate::help_overlay;
 use crate::keys::install_key_handler;
-use crate::menu::{
-    LEVELS, abandon_dialog, customize_popup, next_seed, start_game, storage, view_menu,
-};
+use crate::menu::{LEVELS, customize_popup, next_seed, start_game, storage, view_menu};
 use gloo_timers::callback::Interval;
 use std::collections::BTreeMap;
 use suduko_engine::Level;
 use suduko_game::{Game, NoteOp, clear_selected, entry, note};
 use suduko_uikit::{InputMode, mmss};
+use yew::html::Scope;
 use yew::prelude::*;
 
 pub(crate) enum Msg {
@@ -34,6 +34,9 @@ pub(crate) enum Msg {
     ShowMeAuto(bool),
     ShowMeDelay(u32),
     NotesToggle,
+    NotesShow(bool),
+    NotesFill,
+    NotesClear,
     NoteApply,
     NoteApplyAll,
     NoteReset,
@@ -51,6 +54,7 @@ pub(crate) struct Model {
     customize_open: bool,
     confirm_open: bool,
     input_mode: InputMode,
+    notes_visible: bool,
     _timer: Interval,
 }
 
@@ -79,6 +83,7 @@ impl Component for Model {
             customize_open: false,
             confirm_open: false,
             input_mode: InputMode::Below,
+            notes_visible: true,
             _timer: Interval::new(1000, {
                 let link = ctx.link().clone();
                 move || link.send_message(Msg::Tick)
@@ -101,19 +106,14 @@ impl Component for Model {
     fn update(&mut self, _ctx: &Context<Self>, msg: Msg) -> bool {
         match msg {
             Msg::Start(level) => {
-                (self.level, self.screen) = (level, Screen::Game);
                 self.game = Some(start_game(level, next_seed()));
+                (self.level, self.screen) = (level, Screen::Game);
             }
             Msg::Select(idx) => self.mut_game(|g| g.select(idx)),
             Msg::Digit(d) => self.mut_game(|g| entry(g, d)),
             Msg::Erase => self.mut_game(clear_selected),
             Msg::InputModeSet(m) => self.input_mode = m,
-            Msg::Tick => {
-                self.mut_game(|g| {
-                    g.elapsed_secs += u32::from(!g.won);
-                    suduko_game::showme::tick(g);
-                });
-            }
+            Msg::Tick => self.mut_game(suduko_game::showme::tick),
             Msg::Menu | Msg::ContextKey(crate::keys::Key::Escape) => return self.escape(),
             Msg::ContextKey(crate::keys::Key::Space) => self.mut_game(clear_selected),
             Msg::ContextKey(crate::keys::Key::Digit(d)) => self.mut_game(|g| entry(g, d)),
@@ -137,7 +137,10 @@ impl Component for Model {
             Msg::ShowMeToggle => self.mut_game(suduko_game::showme::toggle),
             Msg::ShowMeAuto(on) => self.mut_game(|g| g.show_me_auto = on),
             Msg::ShowMeDelay(t) => self.mut_game(|g| g.show_me_delay_ticks = t),
-            Msg::NotesToggle => self.mut_game(|g| g.notes = g.notes.next()),
+            Msg::NotesToggle => self.mut_game(|g| g.pencil = !g.pencil),
+            Msg::NotesShow(on) => self.notes_visible = on,
+            Msg::NotesFill => self.mut_game(|g| note(g, NoteOp::FillUser)),
+            Msg::NotesClear => self.mut_game(|g| note(g, NoteOp::ClearUser)),
             Msg::NoteApply => self.mut_game(|g| note(g, NoteOp::ApplyCurrent)),
             Msg::NoteApplyAll => self.mut_game(|g| note(g, NoteOp::ApplyAll)),
             Msg::NoteReset => self.mut_game(|g| note(g, NoteOp::Reset)),
@@ -164,10 +167,10 @@ impl Component for Model {
             Screen::Game => match &self.game {
                 Some(game) => html! {
                     <>
-                        { view_board(game, self.level, self.input_mode, link) }
-                        { if self.customize_open { customize_popup(self.input_mode, link) } else { html!{} } }
+                        { view_board(game, self.level, self.input_mode, self.notes_visible, link) }
+                        { if self.customize_open { customize_popup(self.input_mode, self.notes_visible, link) } else { html!{} } }
                         { if self.confirm_open { abandon_dialog(link) } else { html!{} } }
-                        { if self.help_open { crate::menu::help_overlay(link) } else { html!{} } }
+                        { if self.help_open { help_overlay(link) } else { html!{} } }
                     </>
                 },
                 None => view_menu(link, &self.stats, None),
@@ -232,7 +235,28 @@ impl Model {
     }
 }
 
-#[function_component(App)]
-pub fn app() -> Html {
-    html! { <Model /> }
+/// The abandon-progress confirmation shown when leaving an
+/// unfinished board. Yes discards the board (stats are kept); No,
+/// the X, or clicking outside keeps playing.
+fn abandon_dialog(link: &Scope<Model>) -> Html {
+    let answer = link.callback(Msg::Abandon);
+    html! {
+        <div class="overlay" data-testid="abandon-overlay" onclick={ answer.reform(|_| false) }>
+            <div class="overlay-card custom-card" onclick={ |e: MouseEvent| e.stop_propagation() }>
+                <button class="close-x" data-testid="abandon-close" onclick={ answer.reform(|_| false) }>
+                    { "x" }
+                </button>
+                <h2>{ "Abandon this board?" }</h2>
+                <p class="dialog-hint">{ "Your progress on this board will be lost (stats are kept)." }</p>
+                <div class="customize-row">
+                    <button class="level-btn danger" data-testid="abandon-yes" onclick={ answer.reform(|_| true) }>
+                        { "Abandon" }
+                    </button>
+                    <button class="level-btn" data-testid="abandon-no" onclick={ answer.reform(|_| false) }>
+                        { "Keep playing" }
+                    </button>
+                </div>
+            </div>
+        </div>
+    }
 }

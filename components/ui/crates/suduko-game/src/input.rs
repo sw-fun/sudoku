@@ -12,7 +12,8 @@ pub struct Outcome {
 }
 
 /// Enters `digit` at `idx`. Wrong entries bump `bad_inputs` every time;
-/// given cells ignore input; winning the last cell sets `won`.
+/// given cells ignore input; winning the last cell sets `won`. Any
+/// placement prunes that digit's pencil note from all twenty peers.
 pub fn set_value(game: &mut Game, idx: usize, digit: u8) -> Outcome {
     if game.is_given(idx) {
         return Outcome {
@@ -25,6 +26,9 @@ pub fn set_value(game: &mut Game, idx: usize, digit: u8) -> Outcome {
         game.bad_inputs += 1;
     }
     game.user[idx] = digit;
+    for p in peers_of(idx) {
+        game.user_marks[p] &= !(1 << (digit - 1));
+    }
     game.won = game.is_won();
     Outcome {
         ignored: false,
@@ -40,61 +44,40 @@ pub fn erase(game: &mut Game, idx: usize) {
     }
 }
 
-/// Enters `digit` into the selected cell, if one is selected, per the
-/// notes mode: `User` toggles a player mark (empty cells, legal
-/// digits only), `Auto` strikes a computed candidate, `Off` places a
-/// value and closes the cell keypad.
+/// Enters `digit` into the selected cell, if one is selected. With
+/// the pencil toggle on it toggles a note (empty cells, legal digits
+/// only); otherwise it places a value (pruning peers' notes) and
+/// closes the cell keypad.
 pub fn entry(game: &mut Game, digit: u8) {
-    use suduko_uikit::NotesMode;
     let Some(&sel) = game.selected.as_ref() else {
         return;
     };
-    match game.notes {
-        NotesMode::User => {
-            if game.shown(sel) != 0 {
-                return;
-            }
-            let base = suduko_tutor::candidates_with(&game.shown_values(), &[]);
-            if base.masks[sel] & (1 << (digit - 1)) != 0 {
-                game.user_marks[sel] ^= 1 << (digit - 1);
-            }
+    if game.pencil {
+        if game.shown(sel) != 0 {
+            return;
         }
-        NotesMode::Auto => {
-            if game.shown(sel) != 0 {
-                return;
-            }
-            let base = suduko_tutor::candidates_with(&game.shown_values(), &[]);
-            if base.masks[sel] & (1 << (digit - 1)) != 0 {
-                let e = (sel, digit);
-                if game.eliminated.contains(&e) {
-                    game.eliminated.retain(|&x| x != e);
-                } else {
-                    game.eliminated.push(e);
-                }
-            }
+        let base = suduko_tutor::candidates_with(&game.shown_values(), &[]);
+        if base.masks[sel] & (1 << (digit - 1)) != 0 {
+            game.user_marks[sel] ^= 1 << (digit - 1);
         }
-        NotesMode::Off => {
-            set_value(game, sel, digit);
-            game.keypad_open = false;
-        }
+        return;
     }
+    set_value(game, sel, digit);
+    game.keypad_open = false;
 }
 
-/// Erases the selected cell, if one is selected: `User` clears the
-/// cell's player marks, `Auto` restores its computed candidates,
-/// `Off` clears the value. Erasing closes the cell keypad.
+/// Erases the selected cell, if one is selected: with pencil on it
+/// clears the cell's notes, otherwise the value. Value erase closes
+/// the cell keypad.
 pub fn clear_selected(game: &mut Game) {
-    use suduko_uikit::NotesMode;
     let Some(&sel) = game.selected.as_ref() else {
         return;
     };
-    match game.notes {
-        NotesMode::User => game.user_marks[sel] = 0,
-        NotesMode::Auto => game.eliminated.retain(|&(i, _)| i != sel),
-        NotesMode::Off => {
-            erase(game, sel);
-            game.keypad_open = false;
-        }
+    if game.pencil {
+        game.user_marks[sel] = 0;
+    } else {
+        erase(game, sel);
+        game.keypad_open = false;
     }
 }
 
@@ -116,7 +99,7 @@ impl Game {
 pub fn keypad_visible(game: &Game) -> bool {
     game.keypad_open
         && game.selected.is_some_and(|sel| !game.is_given(sel))
-        && game.notes == suduko_uikit::NotesMode::Off
+        && !game.pencil
         && !game.show_me
         && !game.won
 }

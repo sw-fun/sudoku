@@ -69,6 +69,7 @@ pub fn step_or_apply(game: &mut Game, delta: isize) {
 /// One timer tick in show-me auto mode: waits out the delay, then
 /// advances one beat.
 pub fn tick(game: &mut Game) {
+    game.elapsed_secs += u32::from(!game.won);
     if !game.show_me || !game.show_me_auto || game.won {
         return;
     }
@@ -103,7 +104,7 @@ pub fn apply(game: &mut Game) {
     game.teaching.refresh(&cands);
     if game.teaching.offers().is_empty()
         && !game.won
-        && let Some(trial) = super::trial::trial_annotation(game, &cands)
+        && let Some(trial) = super::build::trial_annotation(game, &cands)
     {
         game.teaching.push_offer(trial);
     }

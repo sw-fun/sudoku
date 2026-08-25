@@ -1,6 +1,6 @@
 number = 23
 slug = "background-image"
-status = "pending"
+status = "in-progress"
 description = "Add color-numbers-bg.jpg (from ~/Dropbox/FilesSharedWithWMA/images/) as the a..."
 role = "production"
 context_files = []
