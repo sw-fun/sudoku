@@ -68,7 +68,13 @@ pub fn step_or_apply(game: &mut Game, delta: isize) {
 
 /// One timer tick in show-me auto mode: waits out the delay, then
 /// advances one beat.
-pub fn tick(game: &mut Game) {
+/// One heartbeat of game time. `active` is false while the player is
+/// away from the game screen (e.g. sitting on the menu with a saved
+/// game): the clock freezes and show-me pacing pauses.
+pub fn tick(game: &mut Game, active: bool) {
+    if !active {
+        return;
+    }
     game.elapsed_secs += u32::from(!game.won);
     if !game.show_me || !game.show_me_auto || game.won {
         return;

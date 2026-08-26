@@ -1,5 +1,6 @@
 //! Show-me solver mode: the game plays itself, strategy by strategy.
 
+use suduko_game::showme;
 use suduko_game::showme::{advance, apply, start, step_or_apply, stop, tick};
 use suduko_game::{Game, from_strings};
 
@@ -84,10 +85,10 @@ fn auto_pace_respects_the_delay_counter() {
         "default pace is one beat per three ticks"
     );
     let before = g.teaching.step_index;
-    tick(&mut g);
-    tick(&mut g);
+    tick(&mut g, true);
+    tick(&mut g, true);
     assert_eq!(g.teaching.step_index, before, "delay ticks do not advance");
-    tick(&mut g);
+    tick(&mut g, true);
     assert_eq!(
         g.teaching.step_index,
         before + 1,
@@ -103,7 +104,7 @@ fn manual_next_pauses_auto() {
     step_or_apply(&mut g, 1);
     assert!(!g.show_me_auto, "manual stepping takes over the pace");
     let before = g.teaching.step_index;
-    tick(&mut g);
+    tick(&mut g, true);
     assert_eq!(g.teaching.step_index, before, "ticks idle once auto is off");
     step_or_apply(&mut g, 1);
     assert!(g.teaching.step_index > before || g.user.iter().any(|&v| v != 0));
@@ -135,4 +136,26 @@ fn trial_fallback_completes_a_hardest_board() {
     assert!(g.is_won());
     assert!(trials > 0, "a hardest board needs the trial fallback");
     assert!(!g.show_me);
+}
+
+#[test]
+fn an_inactive_tick_freezes_the_clock_and_the_solver() {
+    let mut g = from_strings(CLUES, SOLUTION).expect("fixture");
+    start(&mut g);
+    let beats_before = g.teaching.step_index;
+    showme::tick(&mut g, false);
+    showme::tick(&mut g, false);
+    assert_eq!(g.elapsed_secs, 0, "clock frozen while away");
+    assert_eq!(
+        g.teaching.step_index, beats_before,
+        "solver paused while away"
+    );
+    for _ in 0..6 {
+        showme::tick(&mut g, true);
+    }
+    assert_eq!(g.elapsed_secs, 6, "clock resumes when active");
+    assert_ne!(
+        g.teaching.step_index, beats_before,
+        "solver advances once active again"
+    );
 }

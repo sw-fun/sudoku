@@ -4,6 +4,10 @@ pub mod keys;
 mod learn;
 mod menu;
 
+use std::collections::BTreeMap;
+use suduko_engine::Level;
+use suduko_game::Game;
+use yew::html::Scope;
 use yew::prelude::*;
 
 #[function_component(App)]
@@ -59,6 +63,50 @@ pub(crate) fn help_overlay(link: &yew::html::Scope<app::Model>) -> Html {
                     onclick={ on_close.reform(|_| ()) }>
                     { "Back to the board" }
                 </button>
+            </div>
+        </div>
+    }
+}
+
+/// Writes the single save slot: stats always, the board only while
+/// in progress (won boards clear the game part).
+pub(crate) fn persist_slot(level: Level, game: Option<&Game>, stats: &BTreeMap<Level, u32>) {
+    let idx = |l: Level| {
+        u8::try_from(menu::LEVELS.iter().position(|&x| x == l).unwrap_or(0)).unwrap_or(0)
+    };
+    let stats = stats
+        .iter()
+        .map(|(l, n)| (idx(*l), *n))
+        .collect::<BTreeMap<_, _>>();
+    let live = game.filter(|g| !g.won);
+    if let Some(store) = menu::storage() {
+        store
+            .set_item("sudoku-save", &suduko_game::save(idx(level), live, &stats))
+            .ok();
+    }
+}
+
+/// The abandon-progress confirmation shown when leaving an
+/// unfinished board or starting a new one over it. Yes discards the
+/// board (stats are kept); No, the X, or clicking outside keeps it.
+pub(crate) fn abandon_dialog(link: &Scope<app::Model>) -> Html {
+    let answer = link.callback(app::Msg::Abandon);
+    html! {
+        <div class="overlay" data-testid="abandon-overlay" onclick={ answer.reform(|_| false) }>
+            <div class="overlay-card custom-card" onclick={ |e: MouseEvent| e.stop_propagation() }>
+                <button class="close-x" data-testid="abandon-close" onclick={ answer.reform(|_| false) }>
+                    { "x" }
+                </button>
+                <h2>{ "Abandon this board?" }</h2>
+                <p class="dialog-hint">{ "Your progress on this board will be lost (stats are kept)." }</p>
+                <div class="customize-row">
+                    <button class="level-btn danger" data-testid="abandon-yes" onclick={ answer.reform(|_| true) }>
+                        { "Abandon" }
+                    </button>
+                    <button class="level-btn" data-testid="abandon-no" onclick={ answer.reform(|_| false) }>
+                        { "Keep playing" }
+                    </button>
+                </div>
             </div>
         </div>
     }

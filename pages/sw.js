@@ -2,7 +2,7 @@
 // sub-path. Register with a relative URL ('sw.js') so the same file
 // works under /sudoku/ in production and at the root during local
 // development.
-const CACHE_NAME = 'sudoku-v0.7.1';
+const CACHE_NAME = 'sudoku-v0.7.2';
 const BASE = new URL('sw.js', self.registration.scope).pathname.replace(/\/sw\.js$/, '/');
 const urlsToCache = [
   BASE,

@@ -2,6 +2,7 @@
 //! dialog state, and save-slot persistence. Menu rendering and the
 //! dialogs live in `menu`; keyboard wiring in `keys`.
 
+use crate::abandon_dialog;
 use crate::board::view_board;
 use crate::help_overlay;
 use crate::keys::install_key_handler;
@@ -11,7 +12,6 @@ use std::collections::BTreeMap;
 use suduko_engine::Level;
 use suduko_game::{Game, NoteOp, clear_selected, entry, note};
 use suduko_uikit::{InputMode, mmss};
-use yew::html::Scope;
 use yew::prelude::*;
 
 pub(crate) enum Msg {
@@ -53,6 +53,7 @@ pub(crate) struct Model {
     help_open: bool,
     customize_open: bool,
     confirm_open: bool,
+    pending_level: Option<Level>,
     input_mode: InputMode,
     notes_visible: bool,
     _timer: Interval,
@@ -82,6 +83,7 @@ impl Component for Model {
             help_open: false,
             customize_open: false,
             confirm_open: false,
+            pending_level: None,
             input_mode: InputMode::Below,
             notes_visible: true,
             _timer: Interval::new(1000, {
@@ -105,18 +107,14 @@ impl Component for Model {
 
     fn update(&mut self, _ctx: &Context<Self>, msg: Msg) -> bool {
         match msg {
-            Msg::Start(level) => {
-                self.game = Some(start_game(level, next_seed()));
-                (self.level, self.screen) = (level, Screen::Game);
-            }
+            Msg::Start(level) => self.start_requested(level),
             Msg::Select(idx) => self.mut_game(|g| g.select(idx)),
             Msg::Digit(d) => self.mut_game(|g| entry(g, d)),
             Msg::Erase => self.mut_game(clear_selected),
             Msg::InputModeSet(m) => self.input_mode = m,
             Msg::Tick => {
-                if matches!(self.screen, Screen::Game) {
-                    self.mut_game(suduko_game::showme::tick);
-                }
+                let active = matches!(self.screen, Screen::Game);
+                self.mut_game(|g| suduko_game::showme::tick(g, active));
             }
             Msg::Menu | Msg::ContextKey(crate::keys::Key::Escape) => return self.escape(),
             Msg::ContextKey(crate::keys::Key::Space) => self.mut_game(clear_selected),
@@ -124,10 +122,7 @@ impl Component for Model {
             Msg::Resume => {
                 self.screen = Screen::Game;
             }
-            Msg::Abandon(true) => {
-                (self.confirm_open, self.game, self.screen) = (false, None, Screen::Menu);
-            }
-            Msg::Abandon(false) => self.confirm_open = false,
+            Msg::Abandon(yes) => self.abandon_answered(yes),
             Msg::ClearStats => self.stats.clear(),
             Msg::CustomizeToggle => self.customize_open = !self.customize_open,
             Msg::NextBoard => {
@@ -150,7 +145,7 @@ impl Component for Model {
             Msg::NoteReset => self.mut_game(|g| note(g, NoteOp::Reset)),
             Msg::HelpToggle => self.help_open = !self.help_open,
         }
-        self.persist();
+        crate::persist_slot(self.level, self.game.as_ref(), &self.stats);
         true
     }
 
@@ -162,11 +157,16 @@ impl Component for Model {
                     .game
                     .as_ref()
                     .map(|g| (self.level.label(), mmss(g.elapsed_secs)));
-                view_menu(
+                let menu = view_menu(
                     link,
                     &self.stats,
                     resume.as_ref().map(|(l, t)| (*l, t.as_str())),
-                )
+                );
+                if self.confirm_open {
+                    html! { <>{ menu }{ abandon_dialog(link) }</> }
+                } else {
+                    menu
+                }
             }
             Screen::Game => match &self.game {
                 Some(game) => html! {
@@ -202,7 +202,7 @@ impl Model {
             self.game = None;
             self.screen = Screen::Menu;
         }
-        self.persist();
+        crate::persist_slot(self.level, self.game.as_ref(), &self.stats);
         true
     }
 
@@ -216,51 +216,41 @@ impl Model {
             if g.won && !was_won {
                 *self.stats.entry(self.level).or_default() += 1;
             }
-            self.persist();
+            crate::persist_slot(self.level, self.game.as_ref(), &self.stats);
         }
     }
 
-    /// Writes the single save slot: stats always, the board only
-    /// while in progress (won boards clear the game part).
-    fn persist(&self) {
-        let idx =
-            |l: Level| u8::try_from(LEVELS.iter().position(|&x| x == l).unwrap_or(0)).unwrap_or(0);
-        let stats = self
-            .stats
-            .iter()
-            .map(|(l, n)| (idx(*l), *n))
-            .collect::<BTreeMap<_, _>>();
-        let live = self.game.as_ref().filter(|g| !g.won);
-        if let Some(store) = storage() {
-            store
-                .set_item(SAVE_KEY, &suduko_game::save(idx(self.level), live, &stats))
-                .ok();
+    /// Starting a level from the menu: an in-progress board is
+    /// guarded behind the abandon confirmation; anything else starts
+    /// immediately.
+    fn start_requested(&mut self, level: Level) {
+        let live = self
+            .game
+            .as_ref()
+            .is_some_and(|g| !g.won && (g.elapsed_secs > 0 || g.user.iter().any(|&v| v != 0)));
+        if live {
+            (self.pending_level, self.confirm_open) = (Some(level), true);
+        } else {
+            self.game = Some(start_game(level, next_seed()));
+            (self.level, self.screen) = (level, Screen::Game);
         }
     }
-}
 
-/// The abandon-progress confirmation shown when leaving an
-/// unfinished board. Yes discards the board (stats are kept); No,
-/// the X, or clicking outside keeps playing.
-fn abandon_dialog(link: &Scope<Model>) -> Html {
-    let answer = link.callback(Msg::Abandon);
-    html! {
-        <div class="overlay" data-testid="abandon-overlay" onclick={ answer.reform(|_| false) }>
-            <div class="overlay-card custom-card" onclick={ |e: MouseEvent| e.stop_propagation() }>
-                <button class="close-x" data-testid="abandon-close" onclick={ answer.reform(|_| false) }>
-                    { "x" }
-                </button>
-                <h2>{ "Abandon this board?" }</h2>
-                <p class="dialog-hint">{ "Your progress on this board will be lost (stats are kept)." }</p>
-                <div class="customize-row">
-                    <button class="level-btn danger" data-testid="abandon-yes" onclick={ answer.reform(|_| true) }>
-                        { "Abandon" }
-                    </button>
-                    <button class="level-btn" data-testid="abandon-no" onclick={ answer.reform(|_| false) }>
-                        { "Keep playing" }
-                    </button>
-                </div>
-            </div>
-        </div>
+    /// The abandon dialog's answer: yes starts the pending level (or
+    /// drops to the menu when none); no returns to the live board.
+    fn abandon_answered(&mut self, yes: bool) {
+        self.confirm_open = false;
+        match (yes, self.pending_level.take()) {
+            (true, Some(level)) => {
+                self.game = Some(start_game(level, next_seed()));
+                (self.level, self.screen) = (level, Screen::Game);
+            }
+            (true, None) => {
+                self.game = None;
+                self.screen = Screen::Menu;
+            }
+            (false, _) if self.game.is_some() => self.screen = Screen::Game,
+            (false, _) => {}
+        }
     }
 }

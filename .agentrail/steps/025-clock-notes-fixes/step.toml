@@ -1,6 +1,6 @@
 number = 25
 slug = "clock-notes-fixes"
-status = "pending"
+status = "in-progress"
 description = "Two bug fixes: (1) reload with an in-progress game - the timer keeps advancin..."
 role = "production"
 context_files = []
