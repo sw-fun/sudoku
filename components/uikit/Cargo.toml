@@ -4,7 +4,7 @@ members = ["crates/suduko-uikit"]
 
 [workspace.package]
 edition = "2024"
-version = "0.7.0"
+version = "0.7.1"
 license = "MIT"
 
 [workspace.lints.rust]

@@ -1,6 +1,6 @@
 number = 24
 slug = "notes-cleanup"
-status = "pending"
+status = "in-progress"
 description = "Notes UX cleanup from user feedback: replace the 3-state NotesMode cycle with..."
 role = "production"
 context_files = []

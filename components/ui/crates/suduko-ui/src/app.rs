@@ -113,7 +113,11 @@ impl Component for Model {
             Msg::Digit(d) => self.mut_game(|g| entry(g, d)),
             Msg::Erase => self.mut_game(clear_selected),
             Msg::InputModeSet(m) => self.input_mode = m,
-            Msg::Tick => self.mut_game(suduko_game::showme::tick),
+            Msg::Tick => {
+                if matches!(self.screen, Screen::Game) {
+                    self.mut_game(suduko_game::showme::tick);
+                }
+            }
             Msg::Menu | Msg::ContextKey(crate::keys::Key::Escape) => return self.escape(),
             Msg::ContextKey(crate::keys::Key::Space) => self.mut_game(clear_selected),
             Msg::ContextKey(crate::keys::Key::Digit(d)) => self.mut_game(|g| entry(g, d)),

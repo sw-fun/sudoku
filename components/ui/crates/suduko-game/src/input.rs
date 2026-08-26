@@ -11,9 +11,11 @@ pub struct Outcome {
     pub wrong: bool,
 }
 
-/// Enters `digit` at `idx`. Wrong entries bump `bad_inputs` every time;
-/// given cells ignore input; winning the last cell sets `won`. Any
-/// placement prunes that digit's pencil note from all twenty peers.
+/// Enters `digit` at `idx`. Wrong entries bump `bad_inputs` every time
+/// and never disturb pencil notes; given cells ignore input; winning
+/// the last cell sets `won`. A correct placement prunes that digit's
+/// note from all twenty peers (wrong guesses leave notes untouched,
+/// so correcting or erasing them needs no restore).
 pub fn set_value(game: &mut Game, idx: usize, digit: u8) -> Outcome {
     if game.is_given(idx) {
         return Outcome {
@@ -26,8 +28,10 @@ pub fn set_value(game: &mut Game, idx: usize, digit: u8) -> Outcome {
         game.bad_inputs += 1;
     }
     game.user[idx] = digit;
-    for p in peers_of(idx) {
-        game.user_marks[p] &= !(1 << (digit - 1));
+    if !wrong {
+        for p in peers_of(idx) {
+            game.user_marks[p] &= !(1 << (digit - 1));
+        }
     }
     game.won = game.is_won();
     Outcome {

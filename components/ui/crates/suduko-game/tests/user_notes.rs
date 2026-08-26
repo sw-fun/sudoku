@@ -1,5 +1,5 @@
 use suduko_game::{
-    Game, NoteOp, clear_selected, entry, from_strings, keypad_visible, note, restore, save,
+    Game, NoteOp, clear_selected, entry, erase, from_strings, keypad_visible, note, restore, save,
     set_value,
 };
 
@@ -66,32 +66,93 @@ fn pencil_erase_clears_the_cells_notes_value_erase_clears_the_value() {
 }
 
 #[test]
-fn placing_a_value_prunes_that_digits_notes_from_all_peers() {
+fn a_correct_placement_prunes_that_digits_notes_from_all_peers() {
     use suduko_grid::peers_of;
     let mut g = game();
-    let peers: Vec<usize> = peers_of(2).to_vec();
-    // pencil 9 into every cell where it is legal (dynamically verified)
+    let place_at = 2usize; // r0c2, solution digit 4
+    let digit = g.solution[place_at];
+    let peers: Vec<usize> = peers_of(place_at).to_vec();
+    // pencil the solution digit everywhere it is legal
     g.pencil = true;
     let mut nonpeer_targets = 0;
     for cell in 0..81usize {
         g.select(cell);
-        entry(&mut g, 9);
-        if !peers.contains(&cell) && g.user_marks[cell] & (1 << 8) != 0 {
+        entry(&mut g, digit);
+        if !peers.contains(&cell) && g.user_marks[cell] & (1 << (digit - 1)) != 0 {
             nonpeer_targets += 1;
         }
     }
-    assert!(nonpeer_targets > 0, "some non-peer holds a 9 note");
+    assert!(nonpeer_targets > 0, "some non-peer holds the note");
     g.pencil = false;
-    // place 9 at r0c2 (empty player cell, solution 4): peers lose the 9 note
-    let out = set_value(&mut g, 2, 9);
-    assert!(out.wrong, "9 is wrong at r0c2 (solution 4)");
+    let out = set_value(&mut g, place_at, digit);
+    assert!(!out.wrong, "the placement is correct");
     for &p in &peers {
-        assert_eq!(g.user_marks[p] & (1 << 8), 0, "peer {p} lost its 9 note");
+        assert_eq!(
+            g.user_marks[p] & (1 << (digit - 1)),
+            0,
+            "peer {p} lost its note"
+        );
     }
     let kept = (0..81)
-        .filter(|&c| !peers.contains(&c) && g.user_marks[c] & (1 << 8) != 0)
+        .filter(|&c| !peers.contains(&c) && g.user_marks[c] & (1 << (digit - 1)) != 0)
         .count();
-    assert_eq!(kept, nonpeer_targets, "every non-peer keeps its 9 note");
+    assert_eq!(kept, nonpeer_targets, "every non-peer keeps its note");
+}
+
+#[test]
+fn a_wrong_guess_never_touches_peer_notes() {
+    use suduko_grid::peers_of;
+    let mut g = game();
+    let place_at = 2usize; // solution digit 4; 9 is wrong here
+    let wrong_digit: u8 = 9;
+    let peers: Vec<usize> = peers_of(place_at).to_vec();
+    g.pencil = true;
+    let mut noted_peers = 0;
+    for cell in 0..81usize {
+        g.select(cell);
+        entry(&mut g, wrong_digit);
+        if peers.contains(&cell) && g.user_marks[cell] & (1 << 8) != 0 {
+            noted_peers += 1;
+        }
+    }
+    assert!(noted_peers > 0, "some peer holds the wrong digit's note");
+    g.pencil = false;
+    let before: Vec<u16> = peers.iter().map(|&p| g.user_marks[p]).collect();
+    // the wrong placement must not prune anything...
+    let out = set_value(&mut g, place_at, wrong_digit);
+    assert!(out.wrong);
+    for (&p, &was) in peers.iter().zip(&before) {
+        assert_eq!(
+            g.user_marks[p], was,
+            "peer {p} keeps every note after the wrong guess"
+        );
+    }
+    // ...erasing keeps them too...
+    erase(&mut g, place_at);
+    for (&p, &was) in peers.iter().zip(&before) {
+        assert_eq!(g.user_marks[p], was, "erase removes nothing");
+    }
+    // ...and the eventual correct placement prunes only its own digit
+    let digit = g.solution[place_at];
+    g.pencil = true;
+    for cell in 0..81usize {
+        g.select(cell);
+        entry(&mut g, digit);
+    }
+    g.pencil = false;
+    set_value(&mut g, place_at, digit);
+    for (&p, &was) in peers.iter().zip(&before) {
+        assert_eq!(
+            g.user_marks[p] & (1 << (digit - 1)),
+            0,
+            "correct placement prunes"
+        );
+        assert_eq!(
+            g.user_marks[p] & (1 << 8),
+            was & (1 << 8),
+            "the 9 notes survive"
+        );
+    }
 }
 
 #[test]

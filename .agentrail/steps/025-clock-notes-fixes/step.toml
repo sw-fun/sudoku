@@ -1,0 +1,8 @@
+number = 25
+slug = "clock-notes-fixes"
+status = "pending"
+description = "Two bug fixes: (1) reload with an in-progress game - the timer keeps advancin..."
+role = "production"
+context_files = []
+created_at = "2026-08-26T13:47:13"
+commits = []
